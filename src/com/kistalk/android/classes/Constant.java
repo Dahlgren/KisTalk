@@ -1,0 +1,42 @@
+package com.kistalk.android.classes;
+
+public interface Constant {
+	/*
+	 * Intent constants
+	 */
+	public static final int CHOOSE_FILE_ID = 1337;
+	public static final int GET_CAMERA_PIC_ID = 1338;
+
+	/*
+	 * Key constants for ContentValues
+	 */
+
+	// Key constants for feed items
+	public static final String KEY_ITEM_ID = "KEY_ITEM_ID";
+	public static final String KEY_ITEM_URL_BIG = "KEY_ITEM_URL_BIG";
+	public static final String KEY_ITEM_URL_SMALL = "KEY_ITEM_URL_SMALL";
+	public static final String KEY_ITEM_USER_ID = "KEY_ITEM_USER_ID";
+	public static final String KEY_ITEM_USER_NAME = "KEY_ITEM_USER_NAME";
+	public static final String KEY_ITEM_DESCRIPTION = "KEY_ITEM_DESCRIPTION";
+	public static final String KEY_ITEM_DATE = "KEY_ITEM_DATE";
+	public static final String KEY_ITEM_NUM_OF_COMS = "hej";
+
+	// Key constants for feed item comments
+	public static final String KEY_COM_ID = "KEY_COM_ID";
+	public static final String KEY_COM_USER_ID = "KEY_COM_USER_ID";
+	public static final String KEY_COM_USER_NAME = "KEY_COM_USER_NAME";
+	public static final String KEY_COM_CONTENT = "KEY_COM_CONTENT";
+	public static final String KEY_COM_DATE = "KEY_COM_DATE";
+
+	// Key constants for
+	public static final String KEY_UPLOAD_IMAGE_URI = "KEY_UPLOAD_IMAGE_URI";
+	public static final String KEY_UPLOAD_IMAGE_DESCRIPTION = "KEY_UPLOAD_IMAGE_DESCRIPTION";
+	
+	public static final String KEY_DB_ADAPTER = "KEY_DB_ADAPTER";
+
+	// public static final String WEBSERVER = "http://130.229.152.123:3000";
+	//public static final String WEBSERVER = "http://ec2.smidigit.se";
+	// public static final String WEBSERVER = "http://130.229.129.5:3000";
+	public static final String WEBSERVER = "http://kistalk.heroku.com";
+
+}
