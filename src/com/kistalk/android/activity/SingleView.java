@@ -1,8 +1,8 @@
 package com.kistalk.android.activity;
 
 import com.kistalk.android.R;
-import com.kistalk.android.classes.Constant;
-import com.kistalk.android.classes.DbAdapter;
+import com.kistalk.android.util.Constant;
+import com.kistalk.android.util.DbAdapter;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -17,6 +17,8 @@ public class SingleView extends ListActivity implements Constant {
 		super.onCreate(savedInstanceState);
 		int itemId = getIntent().getIntExtra(KEY_ITEM_ID, 0);
 		finish();
+		
+		
 		
 //		
 //		dbAdapter.open();

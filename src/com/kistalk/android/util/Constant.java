@@ -1,4 +1,4 @@
-package com.kistalk.android.classes;
+package com.kistalk.android.util;
 
 public interface Constant {
 	/*

@@ -9,11 +9,11 @@ import java.util.concurrent.ExecutionException;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.kistalk.android.R;
-import com.kistalk.android.classes.AndXMLParser;
-import com.kistalk.android.classes.AndroidTransferManager;
-import com.kistalk.android.classes.Constant;
-import com.kistalk.android.classes.DbAdapter;
-import com.kistalk.android.classes.FeedItem;
+import com.kistalk.android.base.FeedItem;
+import com.kistalk.android.util.AndXMLParser;
+import com.kistalk.android.util.AndroidTransferManager;
+import com.kistalk.android.util.Constant;
+import com.kistalk.android.util.DbAdapter;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -46,7 +46,7 @@ public class KisTalk extends ListActivity implements Constant {
 	public static File filesDir;
 
 	// private instances of classes
-	public DbAdapter dbAdapter;
+	public static DbAdapter dbAdapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -157,7 +157,7 @@ public class KisTalk extends ListActivity implements Constant {
 				//Object item = adapter.getItem(position);
 				dialog(String.valueOf(itemId));
 				
-				//showComments(itemId);
+				showComments(itemId);
 				
 
 			}
@@ -211,30 +211,10 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	protected void showComments(int itemId) {
-		Dialog d = new Dialog(this);
-		
-		ListView lv = new ListView(this);
-		
-		
-		dbAdapter.open();
-		Cursor cur = dbAdapter.fetchComments(itemId);
-
-		String[] displayFields = new String[] {KEY_COM_USER_NAME, KEY_COM_CONTENT};
-
-		int[] displayViews = new int[] {R.id.user_name, R.id.description};
-
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-				R.layout.status_feed_item, cur, displayFields, displayViews);
-
-		//lv.setAdapter(adapter);
-		
-		d.addContentView(lv, null);
-		
-		d.show();
-		
-		dbAdapter.close();
-		
-		
+		Intent intent = new Intent(this, SingleView.class);
+		intent.setAction(Intent.ACTION_VIEW);
+		intent.putExtra(KEY_ITEM_ID, itemId);
+		startActivity(intent);
 	}
 	
 	protected void showCommentz(int itemId) {

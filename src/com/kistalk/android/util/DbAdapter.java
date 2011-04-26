@@ -1,5 +1,5 @@
 // See NotesDbAdapter
-package com.kistalk.android.classes;
+package com.kistalk.android.util;
 
 import java.util.LinkedList;
 

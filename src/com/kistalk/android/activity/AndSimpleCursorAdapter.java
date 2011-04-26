@@ -1,7 +1,7 @@
 package com.kistalk.android.activity;
 
 
-import com.kistalk.android.classes.Constant;
+import com.kistalk.android.util.Constant;
 
 import android.content.Context;
 import android.database.Cursor;

@@ -1,4 +1,4 @@
-package com.kistalk.android.classes;
+package com.kistalk.android.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +15,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
+import com.kistalk.android.base.FeedItem;
 
 import android.content.ContentValues;
 import android.content.pm.FeatureInfo;

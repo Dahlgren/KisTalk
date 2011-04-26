@@ -1,4 +1,4 @@
-package com.kistalk.android.classes;
+package com.kistalk.android.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,8 +21,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.kistalk.android.classes.Base64;
 import com.kistalk.android.activity.KisTalk;
+import com.kistalk.android.base.Base64;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

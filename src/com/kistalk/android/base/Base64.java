@@ -147,7 +147,7 @@
  * @version 2.3.7
  */
 
-package com.kistalk.android.classes;
+package com.kistalk.android.base;
 
 public class Base64
 {

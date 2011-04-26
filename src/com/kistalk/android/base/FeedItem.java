@@ -1,4 +1,4 @@
-package com.kistalk.android.classes;
+package com.kistalk.android.base;
 
 import java.util.LinkedList;
 
