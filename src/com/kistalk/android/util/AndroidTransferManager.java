@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
@@ -32,6 +33,8 @@ import android.content.ContentValues;
 
 public class AndroidTransferManager implements Constant {
 
+	private final static String TAG = "AndroidTransferManager";
+
 	final private int IMAGE_JPEG_QUALITY = 95;
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
@@ -47,32 +50,39 @@ public class AndroidTransferManager implements Constant {
 	}
 
 	public Uri downloadImage(String fileUrl) {
-		Uri uri = null;
-		try {
-			
-			URL url = new URL(fileUrl.replace(" ", "%20"));
-			HttpURLConnection httpConnection = (HttpURLConnection) url
-					.openConnection();
-			httpConnection.setDoInput(true);
-			httpConnection.connect();
-			int responseCode = httpConnection.getResponseCode();
 
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				InputStream is = httpConnection.getInputStream();
-				Bitmap image = BitmapFactory.decodeStream(is);
+		String delimiter = "://";
+		String[] splittedString = fileUrl.split(delimiter);
+		if (splittedString.length == 2) {
+			String encodedAdress = URLEncoder.encode(splittedString[1])
+					.replace("%2F", "/");
+			String encodedUrl = splittedString[0] + delimiter + encodedAdress;
+			try {
+				URL url = new URL(encodedUrl);
+				HttpURLConnection httpConnection = (HttpURLConnection) url
+						.openConnection();
+				httpConnection.setDoInput(true);
+				httpConnection.connect();
+				int responseCode = httpConnection.getResponseCode();
 
-				File pathToImage = File.createTempFile("image", ".jpg",
-						KisTalk.cacheDir);
-				
-				FileOutputStream fos = new FileOutputStream(pathToImage);
-				image.compress(Bitmap.CompressFormat.JPEG, IMAGE_JPEG_QUALITY,
-						fos);
-				uri = Uri.fromFile(pathToImage);
+				if (responseCode == HttpURLConnection.HTTP_OK) {
+					InputStream is = httpConnection.getInputStream();
+					Bitmap image = BitmapFactory.decodeStream(is);
+
+					File pathToImage = File.createTempFile("image", ".jpg",
+							KisTalk.cacheDir);
+
+					FileOutputStream fos = new FileOutputStream(pathToImage);
+					image.compress(Bitmap.CompressFormat.JPEG,
+							IMAGE_JPEG_QUALITY, fos);
+					return Uri.fromFile(pathToImage);
+				}
+			} catch (IOException e) {
+				Log.e(TAG, "ERROR in downloading", e);
 			}
-		} catch (IOException e) {
-			Log.e("ERROR in downloading", e.toString());
-		}
-		return uri;
+		} else
+			Log.e(TAG, "Bad url");
+		return null;
 	}
 
 	/*
