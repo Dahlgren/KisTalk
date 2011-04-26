@@ -14,6 +14,7 @@ import com.kistalk.android.util.AndXMLParser;
 import com.kistalk.android.util.AndroidTransferManager;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
+import com.kistalk.android.util.ImageLoader;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -62,7 +63,7 @@ public class KisTalk extends ListActivity implements Constant {
 		// Uri uri =
 		// atm.downloadImage("http://ec2.smidigit.se/img/img1_800.jpg");
 		// ((ImageView) findViewById(R.id.imageView1)).setImageURI(uri);
-
+		
 		refreshPosts();
 
 		setOnClickListeners();
@@ -231,6 +232,9 @@ public class KisTalk extends ListActivity implements Constant {
 			AndroidTransferManager atm = new AndroidTransferManager();
 			for (FeedItem feedItem : feedItems) {
 				String url = feedItem.post.getAsString(KEY_ITEM_URL_BIG);
+				
+//				ImageLoader.start(url, (ImageView) findViewById(R.id.imageView1));
+				
 				Uri uri = atm.downloadImage(url);
 				feedItem.post.put(KEY_ITEM_URL_BIG, uri.toString());
 				dbAdapter.insertPost(feedItem.post);
