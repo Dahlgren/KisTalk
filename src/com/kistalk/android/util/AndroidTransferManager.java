@@ -10,17 +10,14 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
 import com.kistalk.android.activity.KisTalk;
 import com.kistalk.android.base.Base64;
 
@@ -118,29 +115,19 @@ public class AndroidTransferManager implements Constant {
 																	// contents
 																	// to a byte
 																	// array
-			String compressedImageString = Base64.encodeBytes(byteArray); // Converts
+			//String compressedImageString = Base64.encodeBytes(byteArray); // Converts
 																			// byte
 																			// array
 																			// to
 																			// Base64
 																			// encoding
-			ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("image",
-					compressedImageString));
+			MultipartEntity multipartEntity = new MultipartEntity();
+			multipartEntity.addPart("multipart/form-data", new ByteArrayBody(byteArray, KEY_UPLOAD_IMAGE_URI));
+			multipartEntity.addPart("multipart/form-data", new StringBody(KEY_UPLOAD_IMAGE_DESCRIPTION));
+			
 			HttpPost httpPost = new HttpPost(WEBSERVER);
-			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			httpPost.setEntity(multipartEntity);
 
-			// Add HttpResponse response for response handling
-			client.execute(httpPost);
-
-			// HttpEntity entity = response.getEntity();
-			// entity.getContent();
-
-			// Now to send image description text
-			nameValuePairs.clear();
-			nameValuePairs.add(new BasicNameValuePair("image_description",
-					message.getAsString(KEY_UPLOAD_IMAGE_DESCRIPTION)));
-			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			client.execute(httpPost);
 		}
 		httpConnection.disconnect();

@@ -139,7 +139,6 @@ public class KisTalk extends ListActivity implements Constant {
 		findViewById(R.id.refresh_button).setOnClickListener(
 				new OnClickListener() {
 
-					@Override
 					public void onClick(View v) {
 						refreshPosts();
 
@@ -148,16 +147,16 @@ public class KisTalk extends ListActivity implements Constant {
 
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 
-			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				SimpleCursorAdapter adapter = (SimpleCursorAdapter) getListAdapter();
 				Cursor cur = adapter.getCursor();
 				int itemId = cur.getInt(cur.getColumnIndex(KEY_ITEM_ID));
-				// Object item = adapter.getItem(position);
-				// dialog(String.valueOf(itemId));
-
+				//Object item = adapter.getItem(position);
+				dialog(String.valueOf(itemId));
+				
 				showComments(itemId);
+				
 
 			}
 		});
@@ -210,22 +209,16 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	protected void showComments(int itemId) {
-		Intent intent = new Intent(KisTalk.this, SingleView.class);
+		Intent intent = new Intent(this, SingleView.class);
 		intent.setAction(Intent.ACTION_VIEW);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.putExtra(KEY_ITEM_ID, itemId);
-		try {
-			KisTalk.this.startActivity(intent);
-		} catch (Exception e) {
-			Log.e(TAG, e.toString());
-		}
-	}
-
-	protected void showCommentz(int itemId) {
-		Intent intent = new Intent(Intent.ACTION_VIEW, null, this,
-				SingleView.class);
 		intent.putExtra(KEY_ITEM_ID, itemId);
 		startActivity(intent);
+	}
+	
+	protected void showCommentz(int itemId) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, null, this, SingleView.class);
+		intent.putExtra(KEY_ITEM_ID, itemId);
+		startActivity(intent);		
 	}
 
 	protected void refreshPosts() {

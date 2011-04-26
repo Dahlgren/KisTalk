@@ -55,7 +55,6 @@ public class UploadMessageTask extends AsyncTask<ContentValues, Void, String> {
 		progDialog.setMessage("Uploading. Please wait...");
 		progDialog.setButton("Cancel", new DialogInterface.OnClickListener() {
 
-			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setMessage("Are you sure you want to cancel?")
