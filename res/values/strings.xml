@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">KisTalk</string>
-    <string name="upload_photo">Upload photo</string>
-    <string name="choose_picture">Choose picture</string>
+    <string name="upload_photo">Camera</string>
+    <string name="choose_picture">Choose</string>
     <string name="empty">No items</string>
     <string name="refresh">Refresh</string>
     <string name="comments">&#160;comments</string>

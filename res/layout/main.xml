@@ -5,15 +5,10 @@
 	<LinearLayout android:layout_height="wrap_content"
 		android:layout_width="fill_parent" android:id="@+id/header"
 		 android:background="#FFFF0080">
-		<TextView android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="@string/app_name" android:id="@+id/logo"></TextView>
-		<Button android:text="@string/upload_photo"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:id="@+id/upload_button"></Button>
-		<Button android:text="@string/choose_picture"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:id="@+id/choose_button"></Button>
-		<ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/refresh" android:id="@+id/refresh_button"></ImageView>
+		<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/logo" android:id="@+id/logo"></ImageView>
+		<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_menu_camera" android:id="@+id/upload_button"></ImageView>
+		<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_menu_upload" android:id="@+id/choose_button"></ImageView>
+		<ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/refresh_button" android:src="@drawable/ic_menu_refresh"></ImageView>
 	</LinearLayout>
 	<ListView android:layout_width="fill_parent" android:id="@+android:id/list" android:layout_height="fill_parent"></ListView>
 	<TextView android:text="@string/empty" android:layout_height="wrap_content"

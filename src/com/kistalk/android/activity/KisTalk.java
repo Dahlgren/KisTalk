@@ -221,7 +221,7 @@ public class KisTalk extends ListActivity implements Constant {
 		}
 	}
 
-	protected void showCommentz(int itemId) {
+	protected void showCommentzz(int itemId) {
 		Intent intent = new Intent(Intent.ACTION_VIEW, null, this,
 				SingleView.class);
 		intent.putExtra(KEY_ITEM_ID, itemId);
