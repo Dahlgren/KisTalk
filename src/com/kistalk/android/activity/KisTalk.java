@@ -28,6 +28,7 @@ import android.provider.MediaStore.Images.ImageColumns;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -55,6 +56,7 @@ public class KisTalk extends ListActivity implements Constant {
 		startUpCheck();
 
 		setContentView(R.layout.main);
+		setFocusListeners();
 
 		dbAdapter = new DbAdapter(this);
 
@@ -63,12 +65,60 @@ public class KisTalk extends ListActivity implements Constant {
 		// atm.downloadImage("http://ec2.smidigit.se/img/img1_800.jpg");
 		// ((ImageView) findViewById(R.id.imageView1)).setImageURI(uri);
 
-		refreshPosts();
+		//refreshPosts();
 
 		setOnClickListeners();
 
 		// new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
 		// .execute("http://ec2.smidigit.se/img/img1_800.jpg");
+	}
+
+	private void setFocusListeners() {
+		findViewById(R.id.choose_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.choose_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.choose_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+		
+		findViewById(R.id.upload_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.upload_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.upload_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+		
+		findViewById(R.id.refresh_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.refresh_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.refresh_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+
 	}
 
 	/*
@@ -212,7 +262,7 @@ public class KisTalk extends ListActivity implements Constant {
 	protected void showComments(int itemId) {
 		Intent intent = new Intent(KisTalk.this, SingleView.class);
 		intent.setAction(Intent.ACTION_VIEW);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.putExtra(KEY_ITEM_ID, itemId);
 		try {
 			KisTalk.this.startActivity(intent);
