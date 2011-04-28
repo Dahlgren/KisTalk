@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.kistalk.android.util;
 
 public interface Constant {
@@ -40,3 +41,4 @@ public interface Constant {
 	public static final String WEBSERVER = "http://www.kistalk.com";
 	public static final String ANDROID_XML_FILE = WEBSERVER + "/android_images.xml";
 }
+

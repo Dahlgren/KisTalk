@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.kistalk.android.activity;
 
 import com.kistalk.android.R;
@@ -30,3 +31,4 @@ public class AndSimpleCursorAdapter extends SimpleCursorAdapter implements
 			
 		}
 }
+
