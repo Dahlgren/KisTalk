@@ -14,7 +14,6 @@ import com.kistalk.android.util.AndXMLParser;
 import com.kistalk.android.util.AndroidTransferManager;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
-import com.kistalk.android.util.ImageLoader;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -29,6 +28,7 @@ import android.provider.MediaStore.Images.ImageColumns;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -56,6 +56,7 @@ public class KisTalk extends ListActivity implements Constant {
 		startUpCheck();
 
 		setContentView(R.layout.main);
+		setFocusListeners();
 
 		dbAdapter = new DbAdapter(this);
 
@@ -63,13 +64,61 @@ public class KisTalk extends ListActivity implements Constant {
 		// Uri uri =
 		// atm.downloadImage("http://ec2.smidigit.se/img/img1_800.jpg");
 		// ((ImageView) findViewById(R.id.imageView1)).setImageURI(uri);
-		
-		refreshPosts();
+
+		//refreshPosts();
 
 		setOnClickListeners();
 
 		// new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
 		// .execute("http://ec2.smidigit.se/img/img1_800.jpg");
+	}
+
+	private void setFocusListeners() {
+		findViewById(R.id.choose_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.choose_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.choose_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+		
+		findViewById(R.id.upload_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.upload_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.upload_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+		
+		findViewById(R.id.refresh_button).setOnFocusChangeListener(
+				new OnFocusChangeListener() {
+
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus)
+							v.findViewById(R.id.refresh_focus_bg).setVisibility(
+									View.VISIBLE);
+						else
+							v.findViewById(R.id.refresh_focus_bg).setVisibility(
+									View.INVISIBLE);
+
+					}
+				});
+
 	}
 
 	/*
@@ -140,6 +189,7 @@ public class KisTalk extends ListActivity implements Constant {
 		findViewById(R.id.refresh_button).setOnClickListener(
 				new OnClickListener() {
 
+					@Override
 					public void onClick(View v) {
 						refreshPosts();
 
@@ -148,16 +198,16 @@ public class KisTalk extends ListActivity implements Constant {
 
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				SimpleCursorAdapter adapter = (SimpleCursorAdapter) getListAdapter();
 				Cursor cur = adapter.getCursor();
 				int itemId = cur.getInt(cur.getColumnIndex(KEY_ITEM_ID));
-				//Object item = adapter.getItem(position);
-				dialog(String.valueOf(itemId));
-				
+				// Object item = adapter.getItem(position);
+				// dialog(String.valueOf(itemId));
+
 				showComments(itemId);
-				
 
 			}
 		});
@@ -210,16 +260,22 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	protected void showComments(int itemId) {
-		Intent intent = new Intent(this, SingleView.class);
+		Intent intent = new Intent(KisTalk.this, SingleView.class);
 		intent.setAction(Intent.ACTION_VIEW);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.putExtra(KEY_ITEM_ID, itemId);
+		try {
+			KisTalk.this.startActivity(intent);
+		} catch (Exception e) {
+			Log.e(TAG, e.toString());
+		}
+	}
+
+	protected void showCommentzz(int itemId) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, null, this,
+				SingleView.class);
 		intent.putExtra(KEY_ITEM_ID, itemId);
 		startActivity(intent);
-	}
-	
-	protected void showCommentz(int itemId) {
-		Intent intent = new Intent(Intent.ACTION_VIEW, null, this, SingleView.class);
-		intent.putExtra(KEY_ITEM_ID, itemId);
-		startActivity(intent);		
 	}
 
 	protected void refreshPosts() {
@@ -228,15 +284,8 @@ public class KisTalk extends ListActivity implements Constant {
 
 		try {
 			LinkedList<FeedItem> feedItems = AndXMLParser
-					.parse("/android_images.xml");
-			AndroidTransferManager atm = new AndroidTransferManager();
+					.fetchAndParse();
 			for (FeedItem feedItem : feedItems) {
-				String url = feedItem.post.getAsString(KEY_ITEM_URL_BIG);
-				
-//				ImageLoader.start(url, (ImageView) findViewById(R.id.imageView1));
-				
-				Uri uri = atm.downloadImage(url);
-				feedItem.post.put(KEY_ITEM_URL_BIG, uri.toString());
 				dbAdapter.insertPost(feedItem.post);
 				dbAdapter.insertComments(feedItem.comments);
 			}

@@ -2,19 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:orientation="vertical">
-	<LinearLayout android:layout_height="wrap_content"
-		android:layout_width="fill_parent" android:id="@+id/header">
-		<TextView android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="@string/app_name" android:id="@+id/logo"></TextView>
-		<Button android:text="@string/upload_photo"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:id="@+id/upload_button"></Button>
-		<Button android:text="@string/choose_picture"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:id="@+id/choose_button"></Button>
-		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/refresh" android:id="@+id/refresh_button"></Button>
-	</LinearLayout>
-	<ImageView android:layout_width="wrap_content" android:id="@+id/imageView1" android:layout_height="wrap_content" android:src="@drawable/icon"></ImageView>
+	<include layout="@layout/header" />
 	<ListView android:layout_width="fill_parent" android:id="@+android:id/list" android:layout_height="fill_parent"></ListView>
 	<TextView android:text="@string/empty" android:layout_height="wrap_content"
 		android:layout_width="wrap_content" android:id="@+android:id/empty"></TextView>

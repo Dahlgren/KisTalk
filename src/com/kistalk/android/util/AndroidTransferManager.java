@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -18,8 +20,8 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.kistalk.android.activity.KisTalk;
-import com.kistalk.android.base.Base64;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,7 +31,10 @@ import android.content.ContentValues;
 
 public class AndroidTransferManager implements Constant {
 
-	final private int IMAGE_JPEG_QUALITY = 95;
+	private final static String TAG = "AndroidTransferManager";
+
+	final private int DOWNLOAD_IMAGE_QUALITY = 95;
+	final private int UPLOAD_IMAGE_QUALITY = 75;
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
 
@@ -44,34 +49,50 @@ public class AndroidTransferManager implements Constant {
 	}
 
 	public Uri downloadImage(String fileUrl) {
-		Uri uri = null;
-		try {
+
+		String delimiter = "://";
+		String[] splittedString = fileUrl.split(delimiter);
+		if (splittedString.length == 2) {
+			String encodedAdress = URLEncoder.encode(splittedString[1])
+					.replace("%2F", "/");
+			String encodedUrl = splittedString[0] + delimiter + encodedAdress;
 			
-			URL url = new URL(fileUrl.replace(" ", "%20"));
-			HttpURLConnection httpConnection = (HttpURLConnection) url
-					.openConnection();
-			httpConnection.setDoInput(true);
-			httpConnection.connect();
-			int responseCode = httpConnection.getResponseCode();
-
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				InputStream is = httpConnection.getInputStream();
-				Bitmap image = BitmapFactory.decodeStream(is);
-
-				File pathToImage = File.createTempFile("image", ".jpg",
-						KisTalk.cacheDir);
+			Log.i(TAG, "Downloading image at: " + encodedUrl);
+			try {
+				URL url = new URL(encodedUrl);
+				HttpURLConnection httpConnection = (HttpURLConnection) url
+						.openConnection();
+				int responseCode = httpConnection.getResponseCode();
 				
-				FileOutputStream fos = new FileOutputStream(pathToImage);
-				image.compress(Bitmap.CompressFormat.JPEG, IMAGE_JPEG_QUALITY,
-						fos);
-				uri = Uri.fromFile(pathToImage);
-			}
-		} catch (IOException e) {
-			Log.e("ERROR in downloading", e.toString());
-		}
-		return uri;
-	}
+				if (responseCode == HttpURLConnection.HTTP_OK) {
+					InputStream inStream = httpConnection.getInputStream();
+					Bitmap image = BitmapFactory.decodeStream(inStream);
 
+					File pathToImage = File.createTempFile("image", ".jpg",
+							KisTalk.cacheDir);
+
+					Log.i(TAG, pathToImage.getPath() + " filesize is: " + pathToImage.length());
+					
+					FileOutputStream fos = new FileOutputStream(pathToImage);
+					image.compress(Bitmap.CompressFormat.JPEG,
+							DOWNLOAD_IMAGE_QUALITY, fos);
+					
+					/* Clean up */
+					inStream.close();
+					fos.close();
+					httpConnection.disconnect();
+					
+					return Uri.fromFile(pathToImage);
+				} else
+					Log.w(TAG, "Connection couldn't be established");
+			} catch (IOException e) {
+				Log.e(TAG, "ERROR in downloading", e);
+			}
+		} else
+			Log.e(TAG, "Bad url");
+		return null;
+	}
+	
 	/*
 	 * Upload an specified image with a description to server
 	 * 
@@ -89,48 +110,53 @@ public class AndroidTransferManager implements Constant {
 		httpConnection.setRequestProperty("METHOD", "POST"); // Sets property
 																// to
 																// header field
+		
 		int responseCode = httpConnection.getResponseCode(); // Return code from
 																// remote HTTP
 																// server
 
 		if (responseCode == HttpURLConnection.HTTP_OK) {
-			ByteArrayOutputStream byteArrayOutStream = new ByteArrayOutputStream();
 
-			/*
-			 * Compresses the image of format JPEG with specified image quality
-			 * to an output stream
-			 */
+			ByteArrayOutputStream byteArrayOutStream = new ByteArrayOutputStream();
 			Bitmap imageToSend = readImageFromLocation(message
 					.getAsString(KEY_UPLOAD_IMAGE_URI));
 
 			/* Error check */
 			if (imageToSend == null) {
+				Log.e(TAG, "Unable to read file to upload");
 				throw new NullPointerException();
 			}
 
+			/*
+			 * Compresses the image of format JPEG with specified image quality
+			 * to an output stream
+			 */
 			imageToSend.compress(Bitmap.CompressFormat.JPEG,
-					IMAGE_JPEG_QUALITY, byteArrayOutStream);
-			byte[] byteArray = byteArrayOutStream.toByteArray(); // Converts the
+					UPLOAD_IMAGE_QUALITY, byteArrayOutStream);
+			byte[] data = byteArrayOutStream.toByteArray(); // Converts the
 																	// stream's
 																	// contents
 																	// to a byte
 																	// array
-			//String compressedImageString = Base64.encodeBytes(byteArray); // Converts
-																			// byte
-																			// array
-																			// to
-																			// Base64
-																			// encoding
+
+			ByteArrayBody imageDataArray = new ByteArrayBody(data, message.getAsString(KEY_UPLOAD_IMAGE_URI));
+			StringBody imageDescription = new StringBody(message.getAsString(KEY_UPLOAD_IMAGE_DESCRIPTION));
+			
 			MultipartEntity multipartEntity = new MultipartEntity();
-			multipartEntity.addPart("multipart/form-data", new ByteArrayBody(byteArray, KEY_UPLOAD_IMAGE_URI));
-			multipartEntity.addPart("multipart/form-data", new StringBody(KEY_UPLOAD_IMAGE_DESCRIPTION));
+			multipartEntity.addPart("", imageDataArray);
+			multipartEntity.addPart("", imageDescription);
 			
 			HttpPost httpPost = new HttpPost(WEBSERVER);
 			httpPost.setEntity(multipartEntity);
 
+			// Add HttpResponse response for response handling
 			client.execute(httpPost);
+			
+			/* Clean up */
+			byteArrayOutStream.close();
 		}
 		httpConnection.disconnect();
+		
 	}
 
 	public Bitmap readImageFromLocation(String uri) {
@@ -144,10 +170,10 @@ public class AndroidTransferManager implements Constant {
 	 * 
 	 * @return Url data in a InputStream
 	 */
-	public static InputStream getUrlData(String file)
+	public static InputStream getXMLFile()
 			throws URISyntaxException, ClientProtocolException, IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpGet method = new HttpGet(new URI(WEBSERVER + file));
+		HttpGet method = new HttpGet(new URI(ANDROID_XML_FILE));
 		HttpResponse res = client.execute(method);
 		return res.getEntity().getContent();
 	}

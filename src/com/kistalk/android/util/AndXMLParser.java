@@ -60,7 +60,7 @@ public class AndXMLParser implements Constant {
 	 * @return list of FeedItem objects
 	 */
 
-	public static LinkedList<FeedItem> parse(String url)
+	public static LinkedList<FeedItem> fetchAndParse()
 			throws XmlPullParserException, ClientProtocolException,
 			URISyntaxException, IOException {
 
@@ -70,7 +70,7 @@ public class AndXMLParser implements Constant {
 
 		// Put XML file into the parser
 		xmlpp.setInput(new InputStreamReader(AndroidTransferManager
-				.getUrlData(url)));
+				.getXMLFile()));
 
 		if (findStartTag(TAG_DOCUMENT, xmlpp, TAG_DOCUMENT)) {
 			return stepIntoDocument(xmlpp);
@@ -190,20 +190,5 @@ public class AndXMLParser implements Constant {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Returns data from a specified URL link
-	 * 
-	 * @param url
-	 * 
-	 * @return HTTP response
-	 */
-	public static InputStream getUrlData(String url) throws URISyntaxException,
-			ClientProtocolException, IOException {
-		DefaultHttpClient client = new DefaultHttpClient();
-		HttpGet method = new HttpGet(new URI(WEBSERVER + url));
-		HttpResponse res = client.execute(method);
-		return res.getEntity().getContent();
 	}
 }

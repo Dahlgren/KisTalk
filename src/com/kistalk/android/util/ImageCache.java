@@ -10,6 +10,7 @@ import java.io.IOException;
 import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import com.kistalk.android.activity.*;
@@ -39,7 +40,8 @@ public class ImageCache {
 		if (containsInCache(imageUrl)) {
 			Bitmap image = null;
 			try {
-				image = retrieveImageFromStorage(saveLocation);
+				File pathToImage = new File(cacheInfo.getAsString(imageUrl));
+				image = retrieveImageFromStorage(pathToImage);
 			} catch (IOException e) {
 				Log.e("ERROR of reading file", e.toString());
 			}
@@ -52,18 +54,16 @@ public class ImageCache {
 	 * Puts neccessary lookup information for the download image along writing
 	 * it to a storage location
 	 */
-	public void putInCache(String imageUrl, Bitmap image) throws IOException {
-		File pathToSave = saveLocation.createTempFile("image", ".jpg");
-		writeImageToStorage(pathToSave, image);
-
+	public void putInCache(String url, String uri) throws IOException {
+		
 		/* Puts url to the image as the key and uri for the location of the file */
-		cacheInfo.put(imageUrl, pathToSave.getAbsolutePath());
+		cacheInfo.put(url, uri);
 	}
 
 	/* Optional method to retrieve the image location */
-	public String getImageUri(String imageUrl) {
-		if (containsInCache(imageUrl))
-			return cacheInfo.getAsString(imageUrl);
+	public String getUri(String url) {
+		if (containsInCache(url))
+			return cacheInfo.getAsString(url);
 		else
 			return null;
 	}
@@ -81,17 +81,7 @@ public class ImageCache {
 		return retrievedBitmap;
 	}
 
-	/* Writes the data at a location */
-	private void writeImageToStorage(File pathToFile, Bitmap imageData)
-			throws IOException {
-		BufferedOutputStream ostream = new BufferedOutputStream(
-				new FileOutputStream(pathToFile));
 
-		imageData.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-
-		/* Clean up */
-		ostream.close();
-	}
 
 	/* Returns a boolean if the image url is in the cache */
 	public boolean containsInCache(String imageUrl) {
