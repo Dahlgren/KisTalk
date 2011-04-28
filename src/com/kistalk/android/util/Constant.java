@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package com.kistalk.android.util;
 
 public interface Constant {
@@ -33,12 +32,15 @@ public interface Constant {
 	public static final String KEY_UPLOAD_IMAGE_URI = "KEY_UPLOAD_IMAGE_URI";
 	public static final String KEY_UPLOAD_IMAGE_DESCRIPTION = "KEY_UPLOAD_IMAGE_DESCRIPTION";
 	
-	public static final String KEY_DB_ADAPTER = "KEY_DB_ADAPTER";
+	// Key constants for ImageLoader, ImageLoaderHandler and ImageCache
+	public static final String KEY_URI = "KEY_URI";
+	public static final String KEY_BITMAP = "KEY_BITMAP";
+	public static final String KEY_RESOURCE = "KEY_RESOURCE"; 
+	
+	// public static final String KEY_DB_ADAPTER = "KEY_DB_ADAPTER";
 
-	// public static final String WEBSERVER = "http://130.229.152.123:3000";
-	//public static final String WEBSERVER = "http://ec2.smidigit.se";
-	// public static final String WEBSERVER = "http://130.229.129.5:3000";
+	// Constants for webserver and more
 	public static final String WEBSERVER = "http://www.kistalk.com";
 	public static final String ANDROID_XML_FILE = WEBSERVER + "/android_images.xml";
-}
 
+}

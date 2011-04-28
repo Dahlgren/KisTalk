@@ -60,17 +60,7 @@ public class KisTalk extends ListActivity implements Constant {
 
 		dbAdapter = new DbAdapter(this);
 
-		// AndroidTransferManager atm = new AndroidTransferManager();
-		// Uri uri =
-		// atm.downloadImage("http://ec2.smidigit.se/img/img1_800.jpg");
-		// ((ImageView) findViewById(R.id.imageView1)).setImageURI(uri);
-
-		//refreshPosts();
-
 		setOnClickListeners();
-
-		// new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
-		// .execute("http://ec2.smidigit.se/img/img1_800.jpg");
 	}
 
 	private void setFocusListeners() {
@@ -158,28 +148,6 @@ public class KisTalk extends ListActivity implements Constant {
 		d.show();
 	}
 
-	/*
-	 * test method
-	 */
-
-	private void bookmarkstest() {
-
-		String[] projection = new String[] { Browser.BookmarkColumns._ID,
-				Browser.BookmarkColumns.TITLE, Browser.BookmarkColumns.URL };
-
-		String[] displayFields = new String[] { Browser.BookmarkColumns.TITLE,
-				Browser.BookmarkColumns.URL };
-
-		int[] displayViews = new int[] { R.id.user_name, R.id.description };
-
-		Cursor cur = managedQuery(android.provider.Browser.BOOKMARKS_URI,
-				projection, null, null, null);
-
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-				R.layout.status_feed_item, cur, displayFields, displayViews);
-
-		setListAdapter(adapter);
-	}
 
 	private void setOnClickListeners() {
 		/*
@@ -204,9 +172,6 @@ public class KisTalk extends ListActivity implements Constant {
 				SimpleCursorAdapter adapter = (SimpleCursorAdapter) getListAdapter();
 				Cursor cur = adapter.getCursor();
 				int itemId = cur.getInt(cur.getColumnIndex(KEY_ITEM_ID));
-				// Object item = adapter.getItem(position);
-				// dialog(String.valueOf(itemId));
-
 				showComments(itemId);
 
 			}
@@ -269,13 +234,6 @@ public class KisTalk extends ListActivity implements Constant {
 		} catch (Exception e) {
 			Log.e(TAG, e.toString());
 		}
-	}
-
-	protected void showCommentzz(int itemId) {
-		Intent intent = new Intent(Intent.ACTION_VIEW, null, this,
-				SingleView.class);
-		intent.putExtra(KEY_ITEM_ID, itemId);
-		startActivity(intent);
 	}
 
 	protected void refreshPosts() {

@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 package com.kistalk.android.activity;
 
 import com.kistalk.android.R;
@@ -20,15 +20,9 @@ public class AndSimpleCursorAdapter extends SimpleCursorAdapter implements
 	}
 
 	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
-		super.bindView(view, context, cursor);
-		
-		ImageView imageView = (ImageView) view.findViewById(R.id.image);
-		String url = cursor.getString(cursor.getColumnIndex(KEY_ITEM_URL_BIG));
-	
-		
-		ImageLoader.start(url, imageView);
-			
-		}
+	public void setViewImage(ImageView v, String value) {
+		v.setImageResource(R.drawable.image_placeholder);
+		ImageLoader.start(value, v);
+	}
 }
 

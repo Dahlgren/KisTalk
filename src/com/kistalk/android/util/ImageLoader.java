@@ -4,13 +4,16 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.kistalk.android.R;
 import com.kistalk.android.base.FeedItem;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,18 +29,17 @@ import android.widget.ImageView;
  * image on the view as soon as it completes.
  * 
  */
-public class ImageLoader implements Runnable {
+public class ImageLoader implements Runnable, Constant {
 
-	public static final int HANDLER_MESSAGE_ID = 0;
-	public static final String FEED_ITEM = "feed_item";
-	public static final String IMAGE_URL = "image_url";
-
-	private static final String LOG_TAG = "ImageLoader";
+	private static final String LOG_TAG = "KisTalk.ImageLoader";
 	// the default thread pool size
 	private static final int DEFAULT_POOL_SIZE = 3;
 
 	private static ThreadPoolExecutor executor;
 	private static ImageCache imageCache;
+	private static HashMap<String, ImageLoaderHandler> activeHandlers;
+
+	private static boolean initialized = false;
 
 	/**
 	 * @param numThreads
@@ -60,22 +62,14 @@ public class ImageLoader implements Runnable {
 	 *            the current context
 	 */
 	private static synchronized void initialize() {
-		if (executor == null) {
+		if (executor == null)
 			executor = (ThreadPoolExecutor) Executors
 					.newFixedThreadPool(DEFAULT_POOL_SIZE);
-		}
-		if (imageCache == null) {
-			imageCache = new ImageCache(25);
-		}
-	}
-
-	private String imageUrl;
-	private ImageView imageView;
-	private Handler handler;
-
-	public ImageLoader(String imageUrl, Handler handler) {
-		this.imageUrl = imageUrl;
-		this.handler = handler;
+		if (imageCache == null)
+			imageCache = new ImageCache();
+		if (activeHandlers == null)
+			activeHandlers = new HashMap<String, ImageLoaderHandler>();
+		initialized = true;
 	}
 
 	/**
@@ -92,19 +86,18 @@ public class ImageLoader implements Runnable {
 	public static void start(String imageUrl, final ImageView imageView) {
 
 		if (imageView == null || imageUrl == null) {
+			Log.w(LOG_TAG, "parameter imageView and/or imageUrl are null");
 			return;
 		}
 
-		initialize();
+		if (!initialized)
+			initialize();
 
-		executor.execute(new ImageLoader(imageUrl, new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				Bundle bundle = msg.getData();
-				String uri = bundle.getString("uri");
-				imageView.setImageURI(Uri.parse(uri));
-			}
-		}));
+		if (activeHandlers.containsKey(imageUrl))
+			activeHandlers.get(imageUrl).addViews(imageView);
+		else
+			executor.execute(new ImageLoader(imageUrl, new ImageLoaderHandler(
+					imageView)));
 	}
 
 	/**
@@ -125,36 +118,50 @@ public class ImageLoader implements Runnable {
 		return imageCache;
 	}
 
+	private String imageUrl;
+	private ImageLoaderHandler handler;
+
+	private ImageLoader(String imageUrl, ImageLoaderHandler handler) {
+		this.imageUrl = imageUrl;
+		this.handler = handler;
+		activeHandlers.put(imageUrl, handler);
+	}
+
 	/**
 	 * The run method for a worker thread. It will first query the image cache
 	 * and if it's a miss, then the worker thread will download the image from
 	 * the Web.
 	 */
 	public void run() {
-		String uri = imageCache.getUri(imageUrl);
-
-		if (uri == null)
-			uri = downloadImage();
-		
 		Bundle bundle = new Bundle();
-		bundle.putString("uri", uri);
-		
+		if (!imageCache.contains(imageUrl)) {
+			if (downloadImage())
+				bundle.putParcelable(KEY_BITMAP, imageCache.getBitmap(imageUrl));
+			else
+				bundle.putInt(KEY_RESOURCE, R.drawable.failed_to_download);
+		} else
+			bundle.putParcelable(KEY_BITMAP, imageCache.getBitmap(imageUrl));
 		Message msg = new Message();
 		msg.setData(bundle);
-		
+
+		activeHandlers.remove(imageUrl);
 		handler.sendMessage(msg);
 	}
 
-	private String downloadImage() {
+	private boolean downloadImage() {
 
 		AndroidTransferManager atm = new AndroidTransferManager();
 		String uri = atm.downloadImage(imageUrl).toString();
 		try {
-			imageCache.putInCache(imageUrl, uri);
+			if (uri != null) {
+				imageCache.put(imageUrl, uri);
+				return true;
+			} else
+				return false;
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "download for " + imageUrl + " failed");
 			e.printStackTrace();
 		}
-		return uri;
+		return false;
 	}
 }

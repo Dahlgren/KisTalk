@@ -1,10 +1,13 @@
 package com.kistalk.android.util;
 
+import java.util.LinkedList;
+
 import com.kistalk.android.base.FeedItem;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,36 +15,33 @@ import android.widget.ImageView;
 
 public class ImageLoaderHandler extends Handler implements Constant {
 
-	private ImageView imageView;
-	private Drawable errorDrawable;
+	private LinkedList<ImageView> imageViews;
 
-	private ImageCache imageCache;
-	private String imageUrl;
-	private FeedItem feedItem;
-
-
-	public ImageLoaderHandler(ImageView imageView, String imageUrl) {
-		this.imageView = imageView;
-		this.imageUrl = imageUrl;
+	public ImageLoaderHandler(ImageView imageView) {
+		imageViews = new LinkedList<ImageView>();
+		imageViews.add(imageView);
 	}
 
-	public ImageLoaderHandler(ImageView imageView, String imageUrl,
-			Drawable errorDrawable) {
-		this(imageView, imageUrl);
-		this.errorDrawable = errorDrawable;
-	}
-
-	@Override
-	public final void handleMessage(Message msg) {
-		if (msg.what == ImageLoader.HANDLER_MESSAGE_ID) {
-			handleImageLoadedMessage(msg);
+	public void handleMessage(Message msg) {
+		Bundle data = msg.getData();
+		
+		if (data.containsKey(KEY_BITMAP)) {
+			Bitmap bitmap = msg.getData().getParcelable(KEY_BITMAP);
+			for (ImageView imageView : imageViews)
+				imageView.setImageBitmap(bitmap);
+		} else if (data.containsKey(KEY_URI)) {
+			Uri uri = Uri.parse(msg.getData().getString(KEY_URI));
+			for (ImageView imageView : imageViews)
+				imageView.setImageURI(uri);
+		} else if (data.containsKey(KEY_RESOURCE)) {
+			int resource = msg.getData().getInt(KEY_RESOURCE);
+			for (ImageView imageView : imageViews)
+				imageView.setImageResource(resource);
 		}
 	}
 
-	protected final void handleImageLoadedMessage(Message msg) {
-		Bundle data = msg.getData();
-		String imageUrl = data.getString(ImageLoader.IMAGE_URL);
-		handleImageLoaded(imageUrl);
+	public void addViews(ImageView imageView) {
+		imageViews.add(imageView);
 	}
 
 	/**
@@ -56,30 +56,5 @@ public class ImageLoaderHandler extends Handler implements Constant {
 	 * @return true if the view was updated with the new image, false if it was
 	 *         discarded
 	 */
-	protected boolean handleImageLoaded(String imageUrl) {
-		// If this handler is used for loading images in a ListAdapter,
-		// the thread will set the image only if it's the right position,
-		// otherwise it won't do anything.
-		if (feedItem != null && imageCache.containsInCache(imageUrl)) {
-			feedItem.post.put(KEY_ITEM_URL_BIG, imageUrl);
-			return true;
-		} else
-			return false;
-	}
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public ImageView getImageView() {
-		return imageView;
-	}
-
-	public void setImageView(ImageView imageView) {
-		this.imageView = imageView;
-	}
 }

@@ -6,6 +6,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import android.content.ContentValues;
 import android.graphics.Bitmap;
@@ -22,13 +27,12 @@ import com.kistalk.android.activity.*;
  */
 public class ImageCache {
 
-	private ContentValues cacheInfo;
-	private File saveLocation;
+	private final static String TAG = "KisTalk.ImageCache";
+	private HashMap<String, String> cacheInfo;
 
 	/* Default constructor */
 	public ImageCache(int numberOfElements) {
-		cacheInfo = new ContentValues(numberOfElements);
-		saveLocation = KisTalk.cacheDir;
+		cacheInfo = new HashMap<String, String>();
 	}
 
 	public ImageCache() {
@@ -37,15 +41,18 @@ public class ImageCache {
 
 	/* Retrieves the bitmap image otherwise returns nothing */
 	public synchronized Bitmap getBitmap(String imageUrl) {
-		if (containsInCache(imageUrl)) {
-			Bitmap image = null;
+		if (contains(imageUrl)) {
+			URI uri;
 			try {
-				File pathToImage = new File(cacheInfo.getAsString(imageUrl));
-				image = retrieveImageFromStorage(pathToImage);
+				uri = new URI(cacheInfo.get(imageUrl));
+				return retrieveImageFromStorage(new File(uri));
+			} catch (URISyntaxException e) {
+				Log.e(TAG, "Bad uri: " + cacheInfo.get(imageUrl), e);
+				e.printStackTrace();
+				return null;
 			} catch (IOException e) {
-				Log.e("ERROR of reading file", e.toString());
+				Log.e(TAG, "ERROR when reading file", e);
 			}
-			return image;
 		}
 		return null;
 	}
@@ -54,16 +61,17 @@ public class ImageCache {
 	 * Puts neccessary lookup information for the download image along writing
 	 * it to a storage location
 	 */
-	public void putInCache(String url, String uri) throws IOException {
-		
+	public void put(String url, String uri) throws IOException {
+
 		/* Puts url to the image as the key and uri for the location of the file */
-		cacheInfo.put(url, uri);
+		if (url != null && uri != null)
+			cacheInfo.put(url, uri);
 	}
 
 	/* Optional method to retrieve the image location */
 	public String getUri(String url) {
-		if (containsInCache(url))
-			return cacheInfo.getAsString(url);
+		if (contains(url))
+			return cacheInfo.get(url);
 		else
 			return null;
 	}
@@ -81,10 +89,8 @@ public class ImageCache {
 		return retrievedBitmap;
 	}
 
-
-
 	/* Returns a boolean if the image url is in the cache */
-	public boolean containsInCache(String imageUrl) {
+	public boolean contains(String imageUrl) {
 		return cacheInfo.containsKey(imageUrl);
 	}
 
@@ -92,6 +98,10 @@ public class ImageCache {
 	 * Clear the cache of all refences TODO: Implement a way to delete files
 	 */
 	public void clear() {
+		for (String uri : cacheInfo.values()) {
+			File cachedImageFile = new File(URI.create(uri));
+			cachedImageFile.delete();
+		}
 		cacheInfo.clear();
 	}
 
