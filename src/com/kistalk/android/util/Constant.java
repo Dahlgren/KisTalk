@@ -37,6 +37,6 @@ public interface Constant {
 	// public static final String WEBSERVER = "http://130.229.152.123:3000";
 	//public static final String WEBSERVER = "http://ec2.smidigit.se";
 	// public static final String WEBSERVER = "http://130.229.129.5:3000";
-	public static final String WEBSERVER = "http://kistalk.heroku.com";
+	public static final String WEBSERVER = "http://www.kistalk.com";
 
 }

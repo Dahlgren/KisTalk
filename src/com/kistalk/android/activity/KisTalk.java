@@ -285,11 +285,7 @@ public class KisTalk extends ListActivity implements Constant {
 		try {
 			LinkedList<FeedItem> feedItems = AndXMLParser
 					.parse("/android_images.xml");
-			AndroidTransferManager atm = new AndroidTransferManager();
 			for (FeedItem feedItem : feedItems) {
-				String url = feedItem.post.getAsString(KEY_ITEM_URL_BIG);
-				Uri uri = atm.downloadImage(url);
-				feedItem.post.put(KEY_ITEM_URL_BIG, uri.toString());
 				dbAdapter.insertPost(feedItem.post);
 				dbAdapter.insertComments(feedItem.comments);
 			}
