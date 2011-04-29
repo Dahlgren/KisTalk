@@ -126,4 +126,14 @@ public class DbAdapter implements Constant {
 		}
 		return mCursor;
 	}
+	
+	public Cursor fetchPostFromId(long itemId) throws SQLException {
+
+		Cursor mCursor = mDb.query(true, DB_TABLE_POSTS, null, KEY_ITEM_ID + "="
+				+ itemId, null, null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
 }

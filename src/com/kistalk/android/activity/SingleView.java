@@ -3,6 +3,7 @@ package com.kistalk.android.activity;
 import com.kistalk.android.R;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
+import com.kistalk.android.util.ImageLoader;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -10,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -20,21 +23,36 @@ public class SingleView extends ListActivity implements Constant {
 		super.onCreate(savedInstanceState);
 		int itemId = getIntent().getIntExtra(KEY_ITEM_ID, 0);
 		
-		setContentView(R.layout.main);
+		setContentView(R.layout.image_view);
 		
 		KisTalk.dbAdapter.open();
+		Cursor cur1 = KisTalk.dbAdapter.fetchPostFromId(itemId);
+		String url = cur1.getString(cur1.getColumnIndex(KEY_ITEM_URL_BIG));
+		String userName = cur1.getString(cur1.getColumnIndex(KEY_ITEM_USER_NAME));
+		String description = cur1.getString(cur1.getColumnIndex(KEY_ITEM_DESCRIPTION));
+		String date = cur1.getString(cur1.getColumnIndex(KEY_ITEM_DATE));
+		
+		View imageItem = findViewById(R.id.image_view_image);
+		ImageLoader.start(url, (ImageView) imageItem.findViewById(R.id.big_image));
+		((TextView)imageItem.findViewById(R.id.user_name)).setText(userName);
+		((TextView)imageItem.findViewById(R.id.description)).setText(description);
+		((TextView)imageItem.findViewById(R.id.date)).setText(date);
+
+		//getListView().addHeaderView(imageItem);
+		
+		
 		Cursor cur = KisTalk.dbAdapter.fetchComments(itemId);
+		String[] displayFields = new String[] {KEY_COM_USER_NAME, KEY_COM_CONTENT, KEY_COM_DATE};
 
-		String[] displayFields = new String[] {KEY_COM_USER_NAME, KEY_COM_CONTENT};
-
-		int[] displayViews = new int[] {R.id.user_name, R.id.description};
+		int[] displayViews = new int[] {R.id.user_name, R.id.comment, R.id.date};
 
 		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-				R.layout.status_feed_item, cur, displayFields, displayViews);
+				R.layout.comment_item, cur, displayFields, displayViews);
 
 		setListAdapter(adapter);
 		
 		KisTalk.dbAdapter.close();
+		
 		
 	}
 	

@@ -62,14 +62,14 @@ public class KisTalk extends ListActivity implements Constant {
 
 		setOnClickListeners();
 	}
-	
+
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		// TODO Auto-generated method stub
-		
+
 		return super.onRetainNonConfigurationInstance();
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
@@ -91,7 +91,7 @@ public class KisTalk extends ListActivity implements Constant {
 
 					}
 				});
-		
+
 		findViewById(R.id.upload_button).setOnFocusChangeListener(
 				new OnFocusChangeListener() {
 
@@ -106,18 +106,18 @@ public class KisTalk extends ListActivity implements Constant {
 
 					}
 				});
-		
+
 		findViewById(R.id.refresh_button).setOnFocusChangeListener(
 				new OnFocusChangeListener() {
 
 					@Override
 					public void onFocusChange(View v, boolean hasFocus) {
 						if (hasFocus)
-							v.findViewById(R.id.refresh_focus_bg).setVisibility(
-									View.VISIBLE);
+							v.findViewById(R.id.refresh_focus_bg)
+									.setVisibility(View.VISIBLE);
 						else
-							v.findViewById(R.id.refresh_focus_bg).setVisibility(
-									View.INVISIBLE);
+							v.findViewById(R.id.refresh_focus_bg)
+									.setVisibility(View.INVISIBLE);
 
 					}
 				});
@@ -160,7 +160,6 @@ public class KisTalk extends ListActivity implements Constant {
 		d.setTitle("Dialog");
 		d.show();
 	}
-
 
 	private void setOnClickListeners() {
 		/*
@@ -254,8 +253,7 @@ public class KisTalk extends ListActivity implements Constant {
 		dbAdapter.deleteAll();
 
 		try {
-			LinkedList<FeedItem> feedItems = AndXMLParser
-					.fetchAndParse();
+			LinkedList<FeedItem> feedItems = AndXMLParser.fetchAndParse();
 			for (FeedItem feedItem : feedItems) {
 				dbAdapter.insertPost(feedItem.post);
 				dbAdapter.insertComments(feedItem.comments);
@@ -271,11 +269,11 @@ public class KisTalk extends ListActivity implements Constant {
 		Cursor cur = dbAdapter.fetchAllPosts();
 
 		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
-				KEY_ITEM_USER_ID, KEY_ITEM_URL_BIG, KEY_ITEM_DESCRIPTION,
-				KEY_ITEM_DATE, KEY_ITEM_NUM_OF_COMS };
+				KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION, KEY_ITEM_DATE,
+				KEY_ITEM_NUM_OF_COMS };
 
-		int[] displayViews = new int[] { R.id.user_name, R.id.user_id,
-				R.id.image, R.id.description, R.id.date, R.id.num_of_comments };
+		int[] displayViews = new int[] { R.id.user_name, R.id.image,
+				R.id.description, R.id.date, R.id.num_of_comments };
 
 		AndSimpleCursorAdapter adapter = new AndSimpleCursorAdapter(this,
 				R.layout.status_feed_item, cur, displayFields, displayViews);
