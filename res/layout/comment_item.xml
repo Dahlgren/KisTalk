@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:id="@+id/comment_item" android:layout_height="wrap_content">
+    <FrameLayout android:id="@+id/frameLayout1" android:layout_height="wrap_content" android:layout_width="50dip"></FrameLayout>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/com_left_column">
+        <ImageView android:layout_width="wrap_content" android:src="@drawable/icon" android:id="@+id/profile_image" android:layout_height="wrap_content"></ImageView>
+        <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/user_name" android:layout_height="wrap_content"></TextView>
+    </LinearLayout>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/com_right_column">
+        <TextView android:text="TextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/comment"></TextView>
+        <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/date" android:layout_height="wrap_content"></TextView>
+    </LinearLayout>
+</LinearLayout>
