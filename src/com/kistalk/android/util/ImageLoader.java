@@ -151,10 +151,10 @@ public class ImageLoader implements Runnable, Constant {
 	private boolean downloadImage() {
 
 		AndroidTransferManager atm = new AndroidTransferManager();
-		String uri = atm.downloadImage(imageUrl).toString();
+		Uri uri = atm.downloadImage(imageUrl);
 		try {
 			if (uri != null) {
-				imageCache.put(imageUrl, uri);
+				imageCache.put(imageUrl, uri.toString());
 				return true;
 			} else
 				return false;

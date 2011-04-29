@@ -62,6 +62,19 @@ public class KisTalk extends ListActivity implements Constant {
 
 		setOnClickListeners();
 	}
+	
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		// TODO Auto-generated method stub
+		
+		return super.onRetainNonConfigurationInstance();
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+	}
 
 	private void setFocusListeners() {
 		findViewById(R.id.choose_button).setOnFocusChangeListener(
