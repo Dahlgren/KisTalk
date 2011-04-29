@@ -4,6 +4,6 @@
 	android:orientation="vertical" android:id="@+id/image_view">
 	
 	<include android:id="@+id/image_view_header"  layout="@layout/header" />
-	<include android:id="@+id/image_view_image"  layout="@layout/big_image_view" />
+	
 	<ListView android:layout_width="fill_parent" android:id="@+android:id/list" android:layout_height="fill_parent"></ListView>
 </LinearLayout>
