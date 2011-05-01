@@ -1,5 +1,6 @@
 package com.kistalk.android.util;
 
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 public class ImageLoader implements Runnable, Constant {
 
 	private static final String LOG_TAG = "util.KisTalk.ImageLoader";
+
 	// the default thread pool size
 	private static final int DEFAULT_POOL_SIZE = 3;
 

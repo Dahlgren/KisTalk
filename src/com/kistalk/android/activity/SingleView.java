@@ -61,7 +61,5 @@ public class SingleView extends ListActivity implements Constant {
 		setListAdapter(adapter);
 
 		KisTalk.dbAdapter.close();
-
 	}
-
 }

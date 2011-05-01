@@ -19,7 +19,8 @@ import android.util.Log;
  */
 public class ImageCache {
 
-	private final static String TAG = "util.KisTalk.ImageCache";
+	private final static String LOG_TAG = "util.KisTalk.ImageCache";
+
 	private HashMap<String, String> cacheInfo;
 
 	/* Default constructor */
@@ -39,11 +40,11 @@ public class ImageCache {
 				uri = new URI(cacheInfo.get(imageUrl));
 				return retrieveImageFromStorage(new File(uri));
 			} catch (URISyntaxException e) {
-				Log.e(TAG, "Bad uri: " + cacheInfo.get(imageUrl), e);
+				Log.e(LOG_TAG, "Bad uri: " + cacheInfo.get(imageUrl), e);
 				e.printStackTrace();
 				return null;
 			} catch (IOException e) {
-				Log.e(TAG, "ERROR when reading file", e);
+				Log.e(LOG_TAG, "ERROR when reading file", e);
 			}
 		}
 		return null;

@@ -1,3 +1,4 @@
+
 package com.kistalk.android.base;
 
 import java.util.LinkedList;
@@ -12,8 +13,4 @@ public class FeedItem {
 		post = new ContentValues();
 		comments = new LinkedList<ContentValues>();
 	}
-	
-	
-	
-
 }

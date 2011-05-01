@@ -30,7 +30,6 @@ public final class R {
         public static final int com_right_column=0x7f05000f;
         public static final int comment=0x7f050010;
         public static final int comment_item=0x7f05000b;
-        public static final int comments=0x7f050003;
         public static final int comments_info=0x7f050021;
         public static final int date=0x7f05000a;
         public static final int description=0x7f050009;
@@ -44,6 +43,7 @@ public final class R {
         public static final int inputbox=0x7f050028;
         public static final int label=0x7f050027;
         public static final int left_column=0x7f05001e;
+        public static final int linearLayout1=0x7f050003;
         public static final int linearLayout2=0x7f050008;
         public static final int linearLayout3=0x7f050004;
         public static final int logo=0x7f050012;

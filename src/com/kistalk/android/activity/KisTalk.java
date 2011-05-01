@@ -34,6 +34,7 @@ public class KisTalk extends ListActivity implements Constant {
 	// TAG used in log file
 	private static final String LOG_TAG = "Activity.KisTalk";
 
+
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
@@ -184,7 +185,6 @@ public class KisTalk extends ListActivity implements Constant {
 		/*
 		 * Button that allows file uploading of picture
 		 */
-
 		findViewById(R.id.choose_button).setOnClickListener(
 				new OnClickListener() {
 
@@ -202,6 +202,7 @@ public class KisTalk extends ListActivity implements Constant {
 						takePhotoAction();
 					}
 				});
+
 
 		// findViewById(R.id.upload_button).setOnClickListener(
 		// new OnClickListener() {

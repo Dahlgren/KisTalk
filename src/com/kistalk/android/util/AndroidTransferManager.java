@@ -11,7 +11,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -20,10 +19,8 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import com.kistalk.android.activity.KisTalk;
 import com.kistalk.android.base.UserMessage;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -32,6 +29,7 @@ import android.util.Log;
 public class AndroidTransferManager implements Constant {
 
 	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
+
 
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
 	final private int UPLOAD_IMAGE_QUALITY = 75;
@@ -128,7 +126,6 @@ public class AndroidTransferManager implements Constant {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
 		}
-
 		httpConnection.setChunkedStreamingMode(0); // All bytes must
 													// be transmitted as a whole
 													// package
@@ -168,6 +165,7 @@ public class AndroidTransferManager implements Constant {
 															// contents
 															// to a byte
 															// array
+
 
 			ByteArrayBody imageDataArray = new ByteArrayBody(data, null);
 			StringBody imageDescription = null;
