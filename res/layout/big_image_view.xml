@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:gravity="center" android:layout_height="wrap_content" android:id="@+id/big_image_item" android:orientation="vertical">
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center" android:id="@+id/image_holder">
+        <ImageView android:layout_width="wrap_content" android:id="@+id/big_image" android:layout_height="wrap_content" android:src="@drawable/image_placeholder"></ImageView>
+    </LinearLayout>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:id="@+id/comments">
+        <LinearLayout android:layout_width="wrap_content" android:id="@+id/linearLayout3" android:layout_height="wrap_content" android:orientation="vertical">
+            <ImageView android:layout_width="wrap_content" android:src="@drawable/icon" android:id="@+id/imageView1" android:layout_height="wrap_content"></ImageView>
+            <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/user_name" android:layout_height="wrap_content"></TextView>
+        </LinearLayout>
+        <FrameLayout android:layout_height="wrap_content" android:layout_width="30dip" android:id="@+id/spacer"></FrameLayout>
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/linearLayout2" android:orientation="vertical">
+            <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/description" android:layout_height="wrap_content"></TextView>
+            <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/date" android:layout_height="wrap_content"></TextView>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
