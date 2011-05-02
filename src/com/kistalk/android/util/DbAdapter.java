@@ -21,21 +21,23 @@ public class DbAdapter implements Constant {
 	private static final String DB_NAME = "kistalk_db";
 	private static final String DB_TABLE_POSTS = "posts";
 	private static final String DB_TABLE_COMMENTS = "comments";
-	private static final int DATABASE_VERSION = 15;
+	private static final int DATABASE_VERSION = 16;
 
 	private static final String DB_CREATE_TABLE_POSTS = "create table "
 			+ DB_TABLE_POSTS + " (" + KEY_ROWID
 			+ " integer primary key autoincrement, " + KEY_ITEM_ID
 			+ " integer not null, " + KEY_ITEM_URL_BIG + " text, "
 			+ KEY_ITEM_URL_SMALL + " text, " + KEY_ITEM_USER_ID + " integer, "
-			+ KEY_ITEM_USER_NAME + " text, " + KEY_ITEM_DESCRIPTION + " text, "
-			+ KEY_ITEM_DATE + " text, " + KEY_ITEM_NUM_OF_COMS + " integer);";
+			+ KEY_ITEM_USER_NAME + " text, " + KEY_ITEM_USER_AVATAR + " text, "
+			+ KEY_ITEM_DESCRIPTION + " text, " + KEY_ITEM_DATE + " text, "
+			+ KEY_ITEM_NUM_OF_COMS + " integer);";
 
 	private static final String DB_CREATE_TABLE_COMMENTS = "create table "
 			+ DB_TABLE_COMMENTS + " (" + KEY_ROWID
 			+ " integer primary key autoincrement, " + KEY_ITEM_ID
 			+ " integer not null, " + KEY_COM_ID + " integer not null, "
 			+ KEY_COM_USER_ID + " integer, " + KEY_COM_USER_NAME + " text, "
+			+ KEY_COM_USER_AVATAR + " text, "
 			+ KEY_COM_CONTENT + " text, " + KEY_COM_DATE + " text);";
 
 	/*
@@ -112,9 +114,10 @@ public class DbAdapter implements Constant {
 	public Cursor fetchAllPosts() {
 		return mDb.query(DB_TABLE_POSTS, null, null, null, null, null, null);
 	}
-	
+
 	public Cursor fetchComments(int itemId) {
-		return mDb.query(DB_TABLE_COMMENTS, null, KEY_ITEM_ID +"=" + itemId, null, null, null, null);
+		return mDb.query(DB_TABLE_COMMENTS, null, KEY_ITEM_ID + "=" + itemId,
+				null, null, null, null);
 	}
 
 	public Cursor fetchPost(long rowId) throws SQLException {
@@ -126,11 +129,11 @@ public class DbAdapter implements Constant {
 		}
 		return mCursor;
 	}
-	
+
 	public Cursor fetchPostFromId(long itemId) throws SQLException {
 
-		Cursor mCursor = mDb.query(true, DB_TABLE_POSTS, null, KEY_ITEM_ID + "="
-				+ itemId, null, null, null, null, null);
+		Cursor mCursor = mDb.query(true, DB_TABLE_POSTS, null, KEY_ITEM_ID
+				+ "=" + itemId, null, null, null, null, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}

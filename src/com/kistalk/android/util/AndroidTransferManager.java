@@ -17,8 +17,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+
 import com.kistalk.android.activity.KisTalk;
 import com.kistalk.android.base.UserMessage;
 import android.graphics.Bitmap;
@@ -30,7 +35,6 @@ public class AndroidTransferManager implements Constant {
 
 	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
 
-
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
 	final private int UPLOAD_IMAGE_QUALITY = 75;
 	private DefaultHttpClient client;
@@ -40,7 +44,7 @@ public class AndroidTransferManager implements Constant {
 	public AndroidTransferManager() {
 		client = new DefaultHttpClient();
 		try {
-			urlObject = new URL(WEBSERVER);
+			urlObject = new URL(WEBSERVER_URL);
 		} catch (MalformedURLException e) {
 			Log.e("Bad URL", e.toString());
 		}
@@ -111,17 +115,19 @@ public class AndroidTransferManager implements Constant {
 	 * @param message
 	 */
 	public void uploadMessage(UserMessage message) {
-		
+
 		/* Error check */
 		if (message == null) {
 			Log.e(LOG_TAG, "Bad upload message");
 			throw new NullPointerException();
 		}
-		
+
 		HttpURLConnection httpConnection = null;
 		try {
-			httpConnection = (HttpURLConnection) urlObject
-					.openConnection(); 		 //Opens a bi-directional connection
+			httpConnection = (HttpURLConnection) urlObject.openConnection(); // Opens
+																				// a
+																				// bi-directional
+																				// connection
 		} catch (IOException e) {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
@@ -141,10 +147,10 @@ public class AndroidTransferManager implements Constant {
 		} catch (IOException e) {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
-		} 
-		
+		}
+
 		if (responseCode == HttpURLConnection.HTTP_OK) {
-			
+
 			ByteArrayOutputStream byteArrayOutStream = new ByteArrayOutputStream();
 			Bitmap imageSend = readImageFromLocation(message.getImagePath());
 
@@ -166,7 +172,6 @@ public class AndroidTransferManager implements Constant {
 															// to a byte
 															// array
 
-
 			ByteArrayBody imageDataArray = new ByteArrayBody(data, null);
 			StringBody imageDescription = null;
 			try {
@@ -176,12 +181,41 @@ public class AndroidTransferManager implements Constant {
 				e.printStackTrace();
 			}
 
-			MultipartEntity multipartEntity = new MultipartEntity();
-			multipartEntity.addPart("", imageDataArray);
-			multipartEntity.addPart("", imageDescription);
+			MultipartEntity outerMultipartEntity = new MultipartEntity();
 
-			HttpPost httpPost = new HttpPost(WEBSERVER);
-			httpPost.setEntity(multipartEntity);
+			MultipartEntity innerMultipartEntity = new MultipartEntity();
+
+			try {
+				StringBody username = new StringBody("zoger");
+				StringBody token = new StringBody("k1igvh1xyg");
+
+				outerMultipartEntity.addPart(UPLOAD_ARG_USERNAME, username);
+				outerMultipartEntity.addPart(UPLOAD_ARG_TOKEN, token);
+			} catch (UnsupportedEncodingException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+
+			innerMultipartEntity.addPart(UPLOAD_ARG_IMAGE, imageDataArray);
+			innerMultipartEntity.addPart(UPLOAD_ARG_DESCRIPTION,
+					imageDescription);
+
+			InputStreamBody inputStreamBody = null;
+			try {
+				inputStreamBody = new InputStreamBody(
+						innerMultipartEntity.getContent(), UPLOAD_ARG_PICTURE);
+			} catch (UnsupportedOperationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			outerMultipartEntity.addPart(UPLOAD_ARG_PICTURE, inputStreamBody);
+
+			HttpPost httpPost = new HttpPost(WEBSERVER_URL + "/api/images/new");
+			httpPost.setEntity(outerMultipartEntity);
 
 			// Add HttpResponse response for response handling
 			try {
@@ -202,7 +236,7 @@ public class AndroidTransferManager implements Constant {
 				e.printStackTrace();
 			}
 		}
-		/* Clean up*/
+		/* Clean up */
 		httpConnection.disconnect();
 	}
 
@@ -220,7 +254,14 @@ public class AndroidTransferManager implements Constant {
 	public static InputStream getXMLFile() throws URISyntaxException,
 			ClientProtocolException, IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpGet method = new HttpGet(new URI(ANDROID_XML_FILE));
+
+		Uri uri = new Uri.Builder().scheme(SCHEME).authority(HOST)
+				.path(XML_FILE_PATH)
+				.appendQueryParameter(UPLOAD_ARG_USERNAME, KisTalk.getUsername())
+				.appendQueryParameter(UPLOAD_ARG_TOKEN, KisTalk.getToken()).build();
+
+		HttpGet method = new HttpGet(new URI(uri.toString()));
+
 		HttpResponse res = client.execute(method);
 		return res.getEntity().getContent();
 	}

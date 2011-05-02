@@ -31,6 +31,8 @@ public class SingleView extends ListActivity implements Constant {
 		String url = cur1.getString(cur1.getColumnIndex(KEY_ITEM_URL_BIG));
 		String userName = cur1.getString(cur1
 				.getColumnIndex(KEY_ITEM_USER_NAME));
+		String avatarUrl = cur1.getString(cur1
+				.getColumnIndex(KEY_ITEM_USER_AVATAR));
 		String description = cur1.getString(cur1
 				.getColumnIndex(KEY_ITEM_DESCRIPTION));
 		String date = cur1.getString(cur1.getColumnIndex(KEY_ITEM_DATE));
@@ -41,6 +43,8 @@ public class SingleView extends ListActivity implements Constant {
 
 		ImageLoader.start(url,
 				(ImageView) imageItem.findViewById(R.id.big_image));
+		ImageLoader.start(avatarUrl,
+				(ImageView) imageItem.findViewById(R.id.profile_image));
 		((TextView) imageItem.findViewById(R.id.user_name)).setText(userName);
 		((TextView) imageItem.findViewById(R.id.description))
 				.setText(description);
@@ -50,12 +54,12 @@ public class SingleView extends ListActivity implements Constant {
 
 		Cursor cur = KisTalk.dbAdapter.fetchComments(itemId);
 		String[] displayFields = new String[] { KEY_COM_USER_NAME,
-				KEY_COM_CONTENT, KEY_COM_DATE };
+				KEY_COM_USER_AVATAR, KEY_COM_CONTENT, KEY_COM_DATE };
 
-		int[] displayViews = new int[] { R.id.user_name, R.id.comment,
-				R.id.date };
+		int[] displayViews = new int[] { R.id.user_name, R.id.profile_image,
+				R.id.comment, R.id.date };
 
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+		AndSimpleCursorAdapter adapter = new AndSimpleCursorAdapter(this,
 				R.layout.comment_item, cur, displayFields, displayViews);
 
 		setListAdapter(adapter);

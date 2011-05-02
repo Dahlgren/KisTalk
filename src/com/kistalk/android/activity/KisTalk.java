@@ -34,10 +34,28 @@ public class KisTalk extends ListActivity implements Constant {
 	// TAG used in log file
 	private static final String LOG_TAG = "Activity.KisTalk";
 
-
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
+	
+	private static String username = "zoger";
+	private static String token = "k1igvh1xyg";
+
+	public static String getUsername() {
+		return username;
+	}
+
+	private static void setUsername(String username) {
+		KisTalk.username = username;
+	}
+
+	public static String getToken() {
+		return token;
+	}
+
+	private static void setToken(String token) {
+		KisTalk.token = token;
+	}
 
 	// private instances of classes
 	public static DbAdapter dbAdapter;
@@ -203,7 +221,6 @@ public class KisTalk extends ListActivity implements Constant {
 					}
 				});
 
-
 		// findViewById(R.id.upload_button).setOnClickListener(
 		// new OnClickListener() {
 		//
@@ -281,6 +298,11 @@ public class KisTalk extends ListActivity implements Constant {
 
 		try {
 			LinkedList<FeedItem> feedItems = AndXMLParser.fetchAndParse();
+			if (feedItems == null){
+				Log.e(LOG_TAG, "Problem when downloading XML file");
+				return;
+			}
+				
 			for (FeedItem feedItem : feedItems) {
 				dbAdapter.insertPost(feedItem.post);
 				dbAdapter.insertComments(feedItem.comments);
@@ -295,11 +317,11 @@ public class KisTalk extends ListActivity implements Constant {
 
 		Cursor cur = dbAdapter.fetchAllPosts();
 
-		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
+		String[] displayFields = new String[] { KEY_ITEM_USER_NAME, KEY_ITEM_USER_AVATAR, 
 				KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION, KEY_ITEM_DATE,
 				KEY_ITEM_NUM_OF_COMS };
 
-		int[] displayViews = new int[] { R.id.user_name, R.id.image,
+		int[] displayViews = new int[] { R.id.user_name, R.id.profile_image, R.id.image,
 				R.id.description, R.id.date, R.id.num_of_comments };
 
 		AndSimpleCursorAdapter adapter = new AndSimpleCursorAdapter(this,
@@ -333,7 +355,8 @@ public class KisTalk extends ListActivity implements Constant {
 	private String getRealPathFromURI(Uri contentUri) {
 
 		String[] proj = { MediaStore.Images.Media.DATA };
-		Cursor cursor = managedQuery(contentUri, proj, // Which columns to return
+		Cursor cursor = managedQuery(contentUri, proj, // Which columns to
+														// return
 				null, // WHERE clause; which rows to return (all rows)
 				null, // WHERE clause selection arguments (none)
 				null); // Order-by clause (ascending by name)

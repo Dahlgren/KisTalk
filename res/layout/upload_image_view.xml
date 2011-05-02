@@ -12,14 +12,12 @@
 				android:layout_height="wrap_content" android:adjustViewBounds="true"
 				android:src="@drawable/image_placeholder" />
 			<TextView android:id="@+id/label" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Type your comment here: "
-				android:layout_below="@id/upload_image" android:paddingTop="25px" />
+				android:layout_height="wrap_content" android:layout_below="@id/upload_image" android:paddingTop="25px" android:text="@string/upload_type_comment"/>
 			<EditText android:id="@+id/inputbox" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:background="@android:drawable/editbox_background"
 				android:layout_below="@id/label" />
 			<Button android:id="@+id/send_button" android:layout_below="@id/inputbox"
-				android:layout_alignRight="@id/inputbox" android:text="Send"
-				android:layout_width="100px" android:layout_height="wrap_content" />
+				android:layout_alignRight="@id/inputbox" android:layout_width="100px" android:layout_height="wrap_content" android:text="@string/upload_send_button"/>
 		</RelativeLayout>
 	</ScrollView>
 </LinearLayout>
