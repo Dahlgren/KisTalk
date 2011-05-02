@@ -11,18 +11,23 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HTTP;
 
 import com.kistalk.android.activity.KisTalk;
 import com.kistalk.android.base.UserMessage;
@@ -151,86 +156,48 @@ public class AndroidTransferManager implements Constant {
 
 		if (responseCode == HttpURLConnection.HTTP_OK) {
 
-			ByteArrayOutputStream byteArrayOutStream = new ByteArrayOutputStream();
-			Bitmap imageSend = readImageFromLocation(message.getImagePath());
+			MultipartEntity multipartEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+			// MultipartEntity multipartEntity = new MultipartEntity();
+			
+			FileBody fileBody = new FileBody(new File(message.getImagePath()));
 
-			/* Error check */
-			if (imageSend == null) {
-				Log.e(LOG_TAG, "Unable to read image");
-				throw new NullPointerException();
-			}
-
-			/*
-			 * Compresses the image of format JPEG with specified image quality
-			 * to an output stream
-			 */
-			imageSend.compress(Bitmap.CompressFormat.JPEG,
-					UPLOAD_IMAGE_QUALITY, byteArrayOutStream);
-			byte[] data = byteArrayOutStream.toByteArray(); // Converts the
-															// stream's
-															// contents
-															// to a byte
-															// array
-
-			ByteArrayBody imageDataArray = new ByteArrayBody(data, null);
 			StringBody imageDescription = null;
 			try {
-				imageDescription = new StringBody(message.getComment());
+				imageDescription = new StringBody(message.getComment(),
+						Charset.forName(HTTP.UTF_8));
 			} catch (UnsupportedEncodingException e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
 			}
 
-			MultipartEntity outerMultipartEntity = new MultipartEntity();
-
-			MultipartEntity innerMultipartEntity = new MultipartEntity();
+			
 
 			try {
-				StringBody username = new StringBody("zoger");
-				StringBody token = new StringBody("k1igvh1xyg");
-
-				outerMultipartEntity.addPart(UPLOAD_ARG_USERNAME, username);
-				outerMultipartEntity.addPart(UPLOAD_ARG_TOKEN, token);
-			} catch (UnsupportedEncodingException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
+				StringBody username = new StringBody(KisTalk.getUsername());
+				multipartEntity.addPart(UPLOAD_ARG_USERNAME, username);
+				StringBody token = new StringBody(KisTalk.getToken());
+				multipartEntity.addPart(UPLOAD_ARG_TOKEN, token);
+			} catch (UnsupportedEncodingException e) {
+				Log.e(LOG_TAG, "StringBody failure", e);
+				e.printStackTrace();
 			}
 
-			innerMultipartEntity.addPart(UPLOAD_ARG_IMAGE, imageDataArray);
-			innerMultipartEntity.addPart(UPLOAD_ARG_DESCRIPTION,
-					imageDescription);
+			multipartEntity.addPart(UPLOAD_ARG_IMAGE, fileBody);
 
-			InputStreamBody inputStreamBody = null;
-			try {
-				inputStreamBody = new InputStreamBody(
-						innerMultipartEntity.getContent(), UPLOAD_ARG_PICTURE);
-			} catch (UnsupportedOperationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			outerMultipartEntity.addPart(UPLOAD_ARG_PICTURE, inputStreamBody);
+			multipartEntity.addPart(UPLOAD_ARG_DESCRIPTION, imageDescription);
 
 			HttpPost httpPost = new HttpPost(WEBSERVER_URL + "/api/images/new");
-			httpPost.setEntity(outerMultipartEntity);
+
+			httpPost.setEntity(multipartEntity);
 
 			// Add HttpResponse response for response handling
 			try {
 				client.execute(httpPost);
+
 			} catch (ClientProtocolException e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
-			} catch (IOException e) {
-				Log.e(LOG_TAG, e.toString());
-				e.printStackTrace();
-			}
-
-			/* Clean up */
-			try {
-				byteArrayOutStream.close();
 			} catch (IOException e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -255,10 +222,14 @@ public class AndroidTransferManager implements Constant {
 			ClientProtocolException, IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		Uri uri = new Uri.Builder().scheme(SCHEME).authority(HOST)
+		Uri uri = new Uri.Builder()
+				.scheme(SCHEME)
+				.authority(HOST)
 				.path(XML_FILE_PATH)
-				.appendQueryParameter(UPLOAD_ARG_USERNAME, KisTalk.getUsername())
-				.appendQueryParameter(UPLOAD_ARG_TOKEN, KisTalk.getToken()).build();
+				.appendQueryParameter(UPLOAD_ARG_USERNAME,
+						KisTalk.getUsername())
+				.appendQueryParameter(UPLOAD_ARG_TOKEN, KisTalk.getToken())
+				.build();
 
 		HttpGet method = new HttpGet(new URI(uri.toString()));
 

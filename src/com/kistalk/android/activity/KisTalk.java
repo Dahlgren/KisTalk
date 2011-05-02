@@ -16,6 +16,7 @@ import com.kistalk.android.util.DbAdapter;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleCursorAdapter;
@@ -37,7 +39,7 @@ public class KisTalk extends ListActivity implements Constant {
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
-	
+
 	private static String username = "zoger";
 	private static String token = "k1igvh1xyg";
 
@@ -298,11 +300,11 @@ public class KisTalk extends ListActivity implements Constant {
 
 		try {
 			LinkedList<FeedItem> feedItems = AndXMLParser.fetchAndParse();
-			if (feedItems == null){
+			if (feedItems == null) {
 				Log.e(LOG_TAG, "Problem when downloading XML file");
 				return;
 			}
-				
+
 			for (FeedItem feedItem : feedItems) {
 				dbAdapter.insertPost(feedItem.post);
 				dbAdapter.insertComments(feedItem.comments);
@@ -317,12 +319,12 @@ public class KisTalk extends ListActivity implements Constant {
 
 		Cursor cur = dbAdapter.fetchAllPosts();
 
-		String[] displayFields = new String[] { KEY_ITEM_USER_NAME, KEY_ITEM_USER_AVATAR, 
-				KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION, KEY_ITEM_DATE,
-				KEY_ITEM_NUM_OF_COMS };
+		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
+				KEY_ITEM_USER_AVATAR, KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION,
+				KEY_ITEM_DATE, KEY_ITEM_NUM_OF_COMS };
 
-		int[] displayViews = new int[] { R.id.user_name, R.id.profile_image, R.id.image,
-				R.id.description, R.id.date, R.id.num_of_comments };
+		int[] displayViews = new int[] { R.id.user_name, R.id.profile_image,
+				R.id.image, R.id.description, R.id.date, R.id.num_of_comments };
 
 		AndSimpleCursorAdapter adapter = new AndSimpleCursorAdapter(this,
 				R.layout.status_feed_item, cur, displayFields, displayViews);

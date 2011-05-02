@@ -58,6 +58,6 @@ public interface Constant {
 	// have to args, image and description
 
 	public static final String UPLOAD_ARG_IMAGE = "image";
-	public static final String UPLOAD_ARG_DESCRIPTION = "description";
+	public static final String UPLOAD_ARG_DESCRIPTION = "comment";
 
 }
