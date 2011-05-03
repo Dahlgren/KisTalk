@@ -17,9 +17,7 @@ import android.util.Log;
  * to immediately access binary image data as {@link Bitmap} objects.
  * 
  */
-public class ImageCache {
-
-	private final static String LOG_TAG = "util.KisTalk.ImageCache";
+public class ImageCache implements Constant {
 
 	private HashMap<String, String> cacheInfo;
 

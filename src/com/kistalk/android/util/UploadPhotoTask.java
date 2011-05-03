@@ -30,9 +30,7 @@ import android.util.Log;
  * */
 
 /* The parameters are of the type ContentValues and the result is of type String */
-public class UploadPhotoTask extends AsyncTask<KT_UploadPhotoMessage, Void, String> {
-
-	private final String LOG_TAG = "util.KisTalk.UploadPhotoTask";
+public class UploadPhotoTask extends AsyncTask<KT_UploadPhotoMessage, Void, String> implements Constant {
 
 	private Context context;
 	private ProgressDialog progDialog;

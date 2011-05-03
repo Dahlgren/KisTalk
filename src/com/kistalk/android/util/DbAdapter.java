@@ -16,8 +16,6 @@ public class DbAdapter implements Constant {
 	public static final String KEY_ROWID = "_id";
 	// Other keys are in AndXMLParser.java
 
-	private static final String TAG = "DbAdapter"; // For logging
-
 	private static final String DB_NAME = "kistalk_db";
 	private static final String DB_TABLE_POSTS = "posts";
 	private static final String DB_TABLE_COMMENTS = "comments";
@@ -66,7 +64,7 @@ public class DbAdapter implements Constant {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+			Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion + ", which will destroy all old data");
 			dropDbTables(db);
 			onCreate(db);
@@ -99,7 +97,7 @@ public class DbAdapter implements Constant {
 
 	public void insertPost(ContentValues post) {
 		if (mDb.insert(DB_TABLE_POSTS, null, post) == -1)
-			Log.e(TAG, "Error while inserting post to db");
+			Log.e(LOG_TAG, "Error while inserting post to db");
 	}
 
 	public boolean deleteNote(long rowId) {

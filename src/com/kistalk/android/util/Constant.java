@@ -1,7 +1,8 @@
 package com.kistalk.android.util;
 
 public interface Constant {
-
+	
+	public static final String LOG_TAG = "KisTalk";
 	/*
 	 * Intent constants
 	 */

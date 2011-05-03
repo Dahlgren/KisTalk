@@ -14,7 +14,7 @@ import com.kistalk.android.base.FeedItem;
 
 import android.content.ContentValues;
 
-public class AndXMLParser implements Constant {
+public class KT_XMLParser implements Constant {
 
 	/* Constant strings */
 

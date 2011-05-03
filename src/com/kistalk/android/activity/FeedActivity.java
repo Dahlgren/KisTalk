@@ -10,7 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.FeedItem;
-import com.kistalk.android.util.AndXMLParser;
+import com.kistalk.android.util.KT_XMLParser;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
 
@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -28,15 +29,10 @@ import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class FeedActivity extends ListActivity implements Constant {
-
-	// TAG used in log file
-	private static final String LOG_TAG = "Activity.KisTalk";
 
 	// public directories for cache and files
 	public static File cacheDir;
@@ -64,7 +60,6 @@ public class FeedActivity extends ListActivity implements Constant {
 	// private instances of classes
 	public static DbAdapter dbAdapter;
 
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,13 +72,14 @@ public class FeedActivity extends ListActivity implements Constant {
 		setOnClickListeners();
 
 		dbAdapter = new DbAdapter(this);
-		
+
 		populateList();
+		refreshPosts();
 	}
 
 	private void populateList() {
 		dbAdapter.open();
-		
+
 		Cursor cur = dbAdapter.fetchAllPosts();
 
 		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
@@ -296,7 +292,8 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void showComments(int itemId) {
-		Intent commentIntent = new Intent(FeedActivity.this, ThreadActivity.class);
+		Intent commentIntent = new Intent(FeedActivity.this,
+				ThreadActivity.class);
 		commentIntent.setAction(Intent.ACTION_VIEW);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		commentIntent.putExtra(KEY_ITEM_ID, itemId);
@@ -308,7 +305,8 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void showUploadView(String pathToImage) {
-		Intent uploadIntent = new Intent(FeedActivity.this, UploadActivity.class);
+		Intent uploadIntent = new Intent(FeedActivity.this,
+				UploadActivity.class);
 		uploadIntent.setAction(Intent.ACTION_VIEW);
 		uploadIntent.putExtra(KEY_UPLOAD_IMAGE_URI, pathToImage);
 
@@ -320,32 +318,43 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	protected void refreshPosts() {
-		dbAdapter.open();
-		dbAdapter.deleteAll();
-		
 
-		try {
-			LinkedList<FeedItem> feedItems = AndXMLParser.fetchAndParse();
-			if (feedItems == null) {
-				Log.e(LOG_TAG, "Problem when downloading XML file");
-				return;
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				dbAdapter.open();
+				dbAdapter.deleteAll();
+
+				try {
+					LinkedList<FeedItem> feedItems = KT_XMLParser
+							.fetchAndParse();
+					if (feedItems == null) {
+						Log.e(LOG_TAG, "Problem when downloading XML file");
+						return null;
+					}
+
+					for (FeedItem feedItem : feedItems) {
+						dbAdapter.insertPost(feedItem.post);
+						dbAdapter.insertComments(feedItem.comments);
+					}
+				} catch (XmlPullParserException e) {
+					Log.e(LOG_TAG, "" + e, e);
+				} catch (IOException e) {
+					Log.e(LOG_TAG, "" + e, e);
+				} catch (URISyntaxException e) {
+					Log.e(LOG_TAG, "" + e, e);
+				}
+
+				dbAdapter.close();
+				return null;
 			}
 
-			for (FeedItem feedItem : feedItems) {
-				dbAdapter.insertPost(feedItem.post);
-				dbAdapter.insertComments(feedItem.comments);
+			@Override
+			protected void onPostExecute(Void result) {
+				populateList();
 			}
-		} catch (XmlPullParserException e) {
-			Log.e(LOG_TAG, e.toString(), e);
-		} catch (IOException e) {
-			Log.e(LOG_TAG, e.toString(), e);
-		} catch (URISyntaxException e) {
-			Log.e(LOG_TAG, e.toString(), e);
-		}
-		
-		dbAdapter.close();
-		
-		populateList();
+		}.execute((Void[]) null);
+
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
