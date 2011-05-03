@@ -1,4 +1,5 @@
-bin/
-.classpath
-.project
-.settings
+/bin
+!bin/KisTalk_clone.apk
+/.classpath
+/.project
+/.gitignore
