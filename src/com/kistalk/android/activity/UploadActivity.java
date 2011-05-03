@@ -16,12 +16,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-public class UploadPhoto extends Activity implements Constant {
+public class UploadActivity extends Activity implements Constant {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.upload_image_view);
+		setContentView(R.layout.upload_view_layout);
 		
 		final String path = this.getIntent().getStringExtra(KEY_UPLOAD_IMAGE_URI);
 		Bitmap storedImage = BitmapFactory.decodeFile(path);
@@ -36,7 +36,7 @@ public class UploadPhoto extends Activity implements Constant {
 			public void onClick(View v) {
 				if (v.getId() == R.id.send_button) {
 					UserMessage message = new UserMessage(path, (String) ((EditText) findViewById(R.id.inputbox)).getText().toString());
-					new UploadPhotoTask(UploadPhoto.this).execute(message);
+					new UploadPhotoTask(UploadActivity.this).execute(message);
 				}
 			}
 		});

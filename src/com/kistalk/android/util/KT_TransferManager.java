@@ -1,6 +1,5 @@
 package com.kistalk.android.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,34 +18,31 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
-import com.kistalk.android.activity.KisTalk;
+import com.kistalk.android.activity.FeedActivity;
 import com.kistalk.android.base.UserMessage;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.net.Uri;
 import android.util.Log;
 
-public class AndroidTransferManager implements Constant {
+public class KT_TransferManager implements Constant {
 
 	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
 
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
-	final private int UPLOAD_IMAGE_QUALITY = 75;
+	
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
 
 	/* Default constructor */
-	public AndroidTransferManager() {
+	public KT_TransferManager() {
 		client = new DefaultHttpClient();
 		try {
 			urlObject = new URL(WEBSERVER_URL);
@@ -90,7 +86,7 @@ public class AndroidTransferManager implements Constant {
 				Bitmap image = BitmapFactory.decodeStream(inStream);
 
 				File pathToImage = File.createTempFile("image", ".jpg",
-						KisTalk.cacheDir);
+						FeedActivity.cacheDir);
 
 				Log.i(LOG_TAG, pathToImage.getPath() + " filesize is: "
 						+ pathToImage.length());
@@ -159,7 +155,7 @@ public class AndroidTransferManager implements Constant {
 			MultipartEntity multipartEntity = new MultipartEntity(
 					HttpMultipartMode.BROWSER_COMPATIBLE);
 			// MultipartEntity multipartEntity = new MultipartEntity();
-			
+
 			FileBody fileBody = new FileBody(new File(message.getImagePath()));
 
 			StringBody imageDescription = null;
@@ -171,12 +167,10 @@ public class AndroidTransferManager implements Constant {
 				e.printStackTrace();
 			}
 
-			
-
 			try {
-				StringBody username = new StringBody(KisTalk.getUsername());
+				StringBody username = new StringBody(FeedActivity.getUsername());
 				multipartEntity.addPart(UPLOAD_ARG_USERNAME, username);
-				StringBody token = new StringBody(KisTalk.getToken());
+				StringBody token = new StringBody(FeedActivity.getToken());
 				multipartEntity.addPart(UPLOAD_ARG_TOKEN, token);
 			} catch (UnsupportedEncodingException e) {
 				Log.e(LOG_TAG, "StringBody failure", e);
@@ -227,8 +221,8 @@ public class AndroidTransferManager implements Constant {
 				.authority(HOST)
 				.path(XML_FILE_PATH)
 				.appendQueryParameter(UPLOAD_ARG_USERNAME,
-						KisTalk.getUsername())
-				.appendQueryParameter(UPLOAD_ARG_TOKEN, KisTalk.getToken())
+						FeedActivity.getUsername())
+				.appendQueryParameter(UPLOAD_ARG_TOKEN, FeedActivity.getToken())
 				.build();
 
 		HttpGet method = new HttpGet(new URI(uri.toString()));

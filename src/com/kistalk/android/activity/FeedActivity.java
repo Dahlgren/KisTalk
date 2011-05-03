@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.kistalk.android.R;
+import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.FeedItem;
 import com.kistalk.android.util.AndXMLParser;
 import com.kistalk.android.util.Constant;
@@ -25,13 +26,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class KisTalk extends ListActivity implements Constant {
+public class FeedActivity extends ListActivity implements Constant {
 
 	// TAG used in log file
 	private static final String LOG_TAG = "Activity.KisTalk";
@@ -48,7 +50,7 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	private static void setUsername(String username) {
-		KisTalk.username = username;
+		FeedActivity.username = username;
 	}
 
 	public static String getToken() {
@@ -56,11 +58,12 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	private static void setToken(String token) {
-		KisTalk.token = token;
+		FeedActivity.token = token;
 	}
 
 	// private instances of classes
 	public static DbAdapter dbAdapter;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,19 +71,41 @@ public class KisTalk extends ListActivity implements Constant {
 		initializeVariables();
 		startUpCheck();
 
-		setContentView(R.layout.main);
+		setContentView(R.layout.feed_view_layout);
+
 		setFocusListeners();
+		setOnClickListeners();
 
 		dbAdapter = new DbAdapter(this);
+		
+		populateList();
+	}
 
-		setOnClickListeners();
+	private void populateList() {
+		dbAdapter.open();
+		
+		Cursor cur = dbAdapter.fetchAllPosts();
+
+		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
+				KEY_ITEM_USER_AVATAR, KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION,
+				KEY_ITEM_DATE, KEY_ITEM_NUM_OF_COMS };
+
+		int[] displayViews = new int[] { R.id.user_name, R.id.avatar,
+				R.id.image, R.id.description, R.id.date, R.id.num_of_comments };
+
+		KT_SimpleCursorAdapter adapter = new KT_SimpleCursorAdapter(this,
+				R.layout.feed_item_layout, cur, displayFields, displayViews);
+
+		setListAdapter(adapter);
+
+		dbAdapter.close();
 	}
 
 	@Override
-	public Object onRetainNonConfigurationInstance() {
-		// TODO Auto-generated method stub
-
-		return super.onRetainNonConfigurationInstance();
+	public void onConfigurationChanged(Configuration newConfig) {
+		// Called when configuration changes because
+		// android:configChanges="orientation" in XML file
+		super.onConfigurationChanged(newConfig);
 	}
 
 	@Override
@@ -271,24 +296,24 @@ public class KisTalk extends ListActivity implements Constant {
 	}
 
 	private void showComments(int itemId) {
-		Intent commentIntent = new Intent(KisTalk.this, SingleView.class);
+		Intent commentIntent = new Intent(FeedActivity.this, ThreadActivity.class);
 		commentIntent.setAction(Intent.ACTION_VIEW);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		commentIntent.putExtra(KEY_ITEM_ID, itemId);
 		try {
-			KisTalk.this.startActivity(commentIntent);
+			FeedActivity.this.startActivity(commentIntent);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.toString());
 		}
 	}
 
 	private void showUploadView(String pathToImage) {
-		Intent uploadIntent = new Intent(KisTalk.this, UploadPhoto.class);
+		Intent uploadIntent = new Intent(FeedActivity.this, UploadActivity.class);
 		uploadIntent.setAction(Intent.ACTION_VIEW);
 		uploadIntent.putExtra(KEY_UPLOAD_IMAGE_URI, pathToImage);
 
 		try {
-			KisTalk.this.startActivity(uploadIntent);
+			FeedActivity.this.startActivity(uploadIntent);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.toString());
 		}
@@ -297,6 +322,7 @@ public class KisTalk extends ListActivity implements Constant {
 	protected void refreshPosts() {
 		dbAdapter.open();
 		dbAdapter.deleteAll();
+		
 
 		try {
 			LinkedList<FeedItem> feedItems = AndXMLParser.fetchAndParse();
@@ -316,23 +342,10 @@ public class KisTalk extends ListActivity implements Constant {
 		} catch (URISyntaxException e) {
 			Log.e(LOG_TAG, e.toString(), e);
 		}
-
-		Cursor cur = dbAdapter.fetchAllPosts();
-
-		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
-				KEY_ITEM_USER_AVATAR, KEY_ITEM_URL_SMALL, KEY_ITEM_DESCRIPTION,
-				KEY_ITEM_DATE, KEY_ITEM_NUM_OF_COMS };
-
-		int[] displayViews = new int[] { R.id.user_name, R.id.profile_image,
-				R.id.image, R.id.description, R.id.date, R.id.num_of_comments };
-
-		AndSimpleCursorAdapter adapter = new AndSimpleCursorAdapter(this,
-				R.layout.status_feed_item, cur, displayFields, displayViews);
-
-		setListAdapter(adapter);
-
+		
 		dbAdapter.close();
-
+		
+		populateList();
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {

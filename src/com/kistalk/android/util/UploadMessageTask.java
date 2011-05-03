@@ -80,7 +80,7 @@ public class UploadMessageTask extends AsyncTask<UserMessage, Void, String> {
 
 	@Override
 	protected String doInBackground(UserMessage... messages) {
-		AndroidTransferManager transferManager = new AndroidTransferManager();
+		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = messages.length;
 		int index = 0;
 		/* If not cancelled or not gone through all items - do work */

@@ -8,4 +8,5 @@
     <string name="comments">&#160;comments</string>
     <string name="upload_type_comment">Type your comment here: </string>
     <string name="upload_send_button">Send</string>
+    <string name="comment">Comment</string>
 </resources>

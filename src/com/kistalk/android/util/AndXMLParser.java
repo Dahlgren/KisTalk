@@ -26,7 +26,7 @@ public class AndXMLParser implements Constant {
 	public static final String TAG_ITEM_URL_BIG = "url-big";
 	public static final String TAG_ITEM_URL_SMALL = "url-thumb";
 	public static final String TAG_ITEM_USER_ID = "image-user-id";
-	public static final String TAG_ITEM_USER_NAME = "image-user";
+	public static final String TAG_ITEM_USER_NAME = "image-user-name";
 	public static final String TAG_ITEM_USER_AVATAR = "image-user-avatar";
 	public static final String TAG_ITEM_DESCRIPTION = "image-description";
 	public static final String TAG_ITEM_DATE = "image-created_at";
@@ -37,7 +37,7 @@ public class AndXMLParser implements Constant {
 
 	public static final String TAG_COM_ID = "comment-id";
 	public static final String TAG_COM_USER_ID = "comment-user-id";
-	public static final String TAG_COM_USER_NAME = "comment-user";
+	public static final String TAG_COM_USER_NAME = "comment-user-name";
 	public static final String TAG_COM_USER_AVATAR = "comment-user-avatar";
 	public static final String TAG_COM_CONTENT = "comment-content";
 	public static final String TAG_COM_DATE = "comment-created_at";
@@ -64,7 +64,7 @@ public class AndXMLParser implements Constant {
 		XmlPullParser xmlpp = factory.newPullParser();
 
 		// Put XML file into the parser
-		xmlpp.setInput(new InputStreamReader(AndroidTransferManager
+		xmlpp.setInput(new InputStreamReader(KT_TransferManager
 				.getXMLFile()));
 
 		if (findStartTag(TAG_DOCUMENT, xmlpp, TAG_DOCUMENT)) {

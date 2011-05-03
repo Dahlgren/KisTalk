@@ -83,7 +83,7 @@ public class UploadPhotoTask extends AsyncTask<UserMessage, Void, String> {
 
 	@Override
 	protected String doInBackground(UserMessage... messages) {
-		AndroidTransferManager transferManager = new AndroidTransferManager();
+		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = messages.length;
 		int index = 0;
 		

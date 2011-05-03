@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="wrap_content"
+	android:layout_height="wrap_content" xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/thread_comment_form">
+	<TextView android:id="@+id/label" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:paddingTop="25px"
+		android:text="@string/upload_type_comment" />
+	<EditText android:id="@+id/inputbox" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:background="@android:drawable/editbox_background"
+		android:layout_below="@id/label" />
+	<Button android:layout_below="@id/inputbox"
+		android:layout_alignRight="@id/inputbox" android:layout_width="100px"
+		android:layout_height="wrap_content" android:text="@string/comment" android:id="@+id/comment_button"/>
+</RelativeLayout>
+

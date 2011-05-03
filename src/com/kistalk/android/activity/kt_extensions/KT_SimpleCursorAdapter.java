@@ -1,5 +1,5 @@
 
-package com.kistalk.android.activity;
+package com.kistalk.android.activity.kt_extensions;
 
 import com.kistalk.android.R;
 import com.kistalk.android.util.Constant;
@@ -10,10 +10,10 @@ import android.database.Cursor;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 
-public class AndSimpleCursorAdapter extends SimpleCursorAdapter implements
+public class KT_SimpleCursorAdapter extends SimpleCursorAdapter implements
 		Constant {
 
-	public AndSimpleCursorAdapter(Context context, int layout, Cursor c,
+	public KT_SimpleCursorAdapter(Context context, int layout, Cursor c,
 			String[] from, int[] to) {
 		super(context, layout, c, from, to);
 	}
