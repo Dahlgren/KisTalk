@@ -45,19 +45,22 @@ public interface Constant {
 	// Constants for webserver and more
 	public static final String SCHEME = "http";
 	public static final String HOST = "www.kistalk.com";
-	public static final String XML_FILE_PATH = "/api/feed/android.xml";
+	public static final String XML_FILE_PATH = "/api/feed/android";
+	
+	public static final String UPLOAD_IMAGE_PATH = "/api/images/create";
+	public static final String POST_COMMENT_PATH = "/api/comment/create";
 	
 	public static final String WEBSERVER_URL = SCHEME + "://" + HOST;
 	public static final String XML_FILE_FULL_URL = WEBSERVER_URL + XML_FILE_PATH;
 
-	// Constants for uploading pictures to webserver (MIME)
-	public static final String UPLOAD_ARG_USERNAME = "username";
-	public static final String UPLOAD_ARG_TOKEN = "token";
-	public static final String UPLOAD_ARG_PICTURE = "picture";
-	// picture argument should be of type MIME (yes, this will be nested) and
-	// have to args, image and description
-
-	public static final String UPLOAD_ARG_IMAGE = "image";
-	public static final String UPLOAD_ARG_DESCRIPTION = "comment";
+	// Argument names for webserver
+	public static final String ARG_USERNAME = "username";
+	public static final String ARG_TOKEN = "token";
+	
+	public static final String ARG_UPLOAD_IMAGE = "image";
+	public static final String ARG_UPLOAD_DESCRIPTION = "comment";
+	
+	public static final String ARG_COMMENT_ITEMID = "image_id";
+	public static final String ARG_COMMENT_CONTENT = "content";
 
 }

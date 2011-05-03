@@ -1,6 +1,6 @@
 package com.kistalk.android.base;
 
-public class UserMessage {
+public class KT_UploadPhotoMessage {
 	
 	private String imagePath;
 	private String comment;
@@ -8,12 +8,12 @@ public class UserMessage {
 	/* Default constructor
 	 * @param imagePath - Path to image
 	 * @param comment - user's comment */
-	public UserMessage(String imagePath, String comment) {
+	public KT_UploadPhotoMessage(String imagePath, String comment) {
 		this.imagePath = imagePath;
 		this.comment = comment;
 	}
 	
-	public UserMessage() {
+	public KT_UploadPhotoMessage() {
 		this(null, null);
 	}
 	

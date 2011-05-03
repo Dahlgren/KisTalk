@@ -1,6 +1,6 @@
 package com.kistalk.android.util;
 
-import com.kistalk.android.base.UserMessage;
+import com.kistalk.android.base.KT_UploadPhotoMessage;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -29,7 +29,7 @@ import android.os.AsyncTask;
  * */
 
 /* The parameters are of the type ContentValues and the result is of type String */
-public class UploadMessageTask extends AsyncTask<UserMessage, Void, String> {
+public class UploadMessageTask_NOT_USED extends AsyncTask<KT_UploadPhotoMessage, Void, String> {
 
 	private Context context;
 	private ProgressDialog progDialog;
@@ -40,7 +40,7 @@ public class UploadMessageTask extends AsyncTask<UserMessage, Void, String> {
 	 * 
 	 * @param context
 	 */
-	public UploadMessageTask(Context context) {
+	public UploadMessageTask_NOT_USED(Context context) {
 		super();
 		this.context = context;
 		progDialog = new ProgressDialog(context);
@@ -79,7 +79,7 @@ public class UploadMessageTask extends AsyncTask<UserMessage, Void, String> {
 	}
 
 	@Override
-	protected String doInBackground(UserMessage... messages) {
+	protected String doInBackground(KT_UploadPhotoMessage... messages) {
 		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = messages.length;
 		int index = 0;

@@ -1,5 +1,6 @@
 package com.kistalk.android.util;
 
+import com.kistalk.android.base.KT_UploadCommentMessage;
 import com.kistalk.android.base.KT_UploadPhotoMessage;
 
 import android.app.AlertDialog;
@@ -30,9 +31,9 @@ import android.util.Log;
  * */
 
 /* The parameters are of the type ContentValues and the result is of type String */
-public class UploadPhotoTask extends AsyncTask<KT_UploadPhotoMessage, Void, String> {
+public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, String> {
 
-	private final String LOG_TAG = "util.KisTalk.UploadPhotoTask";
+	private final String LOG_TAG = "util.KisTalk.UploadCommentTask";
 
 	private Context context;
 	private ProgressDialog progDialog;
@@ -43,7 +44,7 @@ public class UploadPhotoTask extends AsyncTask<KT_UploadPhotoMessage, Void, Stri
 	 * 
 	 * @param context
 	 */
-	public UploadPhotoTask(Context context) {
+	public UploadCommentTask(Context context) {
 		super();
 		this.context = context;
 		this.progDialog = new ProgressDialog(context);
@@ -82,15 +83,15 @@ public class UploadPhotoTask extends AsyncTask<KT_UploadPhotoMessage, Void, Stri
 	}
 
 	@Override
-	protected String doInBackground(KT_UploadPhotoMessage... messages) {
+	protected String doInBackground(KT_UploadCommentMessage... messages) {
 		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = messages.length;
 		int index = 0;
 		
-		/* If not cancelled or not gone through all items - do work */
+		/* If not canceled or not gone through all items - do work */
 		while (!isCancelled() && index < count) {
 			Log.i(LOG_TAG, "Uploading message");
-			transferManager.uploadMessage(messages[index]);
+			transferManager.uploadComment(messages[index]);
 			index++;
 		}
 		return "Upload complete!";

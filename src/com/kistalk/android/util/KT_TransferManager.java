@@ -24,7 +24,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
 import com.kistalk.android.activity.FeedActivity;
-import com.kistalk.android.base.UserMessage;
+import com.kistalk.android.base.KT_UploadCommentMessage;
+import com.kistalk.android.base.KT_UploadPhotoMessage;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,7 +38,7 @@ public class KT_TransferManager implements Constant {
 	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
 
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
-	
+
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
 
@@ -115,7 +116,7 @@ public class KT_TransferManager implements Constant {
 	 * 
 	 * @param message
 	 */
-	public void uploadMessage(UserMessage message) {
+	public void uploadMessage(KT_UploadPhotoMessage message) {
 
 		/* Error check */
 		if (message == null) {
@@ -169,23 +170,23 @@ public class KT_TransferManager implements Constant {
 
 			try {
 				StringBody username = new StringBody(FeedActivity.getUsername());
-				multipartEntity.addPart(UPLOAD_ARG_USERNAME, username);
+				multipartEntity.addPart(ARG_USERNAME, username);
 				StringBody token = new StringBody(FeedActivity.getToken());
-				multipartEntity.addPart(UPLOAD_ARG_TOKEN, token);
+				multipartEntity.addPart(ARG_TOKEN, token);
 			} catch (UnsupportedEncodingException e) {
 				Log.e(LOG_TAG, "StringBody failure", e);
 				e.printStackTrace();
 			}
 
-			multipartEntity.addPart(UPLOAD_ARG_IMAGE, fileBody);
+			multipartEntity.addPart(ARG_UPLOAD_IMAGE, fileBody);
 
-			multipartEntity.addPart(UPLOAD_ARG_DESCRIPTION, imageDescription);
+			multipartEntity.addPart(ARG_UPLOAD_DESCRIPTION, imageDescription);
 
-			HttpPost httpPost = new HttpPost(WEBSERVER_URL + "/api/images/new");
+			HttpPost httpPost = new HttpPost(WEBSERVER_URL + UPLOAD_IMAGE_PATH);
 
 			httpPost.setEntity(multipartEntity);
 
-			// Add HttpResponse response for response handling
+			// TODO: Add HttpResponse response for response handling
 			try {
 				client.execute(httpPost);
 
@@ -216,18 +217,91 @@ public class KT_TransferManager implements Constant {
 			ClientProtocolException, IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		Uri uri = new Uri.Builder()
-				.scheme(SCHEME)
-				.authority(HOST)
+		Uri uri = new Uri.Builder().scheme(SCHEME).authority(HOST)
 				.path(XML_FILE_PATH)
-				.appendQueryParameter(UPLOAD_ARG_USERNAME,
-						FeedActivity.getUsername())
-				.appendQueryParameter(UPLOAD_ARG_TOKEN, FeedActivity.getToken())
+				.appendQueryParameter(ARG_USERNAME, FeedActivity.getUsername())
+				.appendQueryParameter(ARG_TOKEN, FeedActivity.getToken())
 				.build();
 
 		HttpGet method = new HttpGet(new URI(uri.toString()));
 
 		HttpResponse res = client.execute(method);
 		return res.getEntity().getContent();
+	}
+
+	public void uploadComment(KT_UploadCommentMessage message) {
+		/* Error check */
+		if (message == null) {
+			Log.e(LOG_TAG, "Bad comment message");
+			throw new NullPointerException();
+		}
+
+		HttpURLConnection httpConnection = null;
+		try {
+			httpConnection = (HttpURLConnection) urlObject.openConnection();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+		// All bytes must be transmitted as a whole package
+		httpConnection.setChunkedStreamingMode(0);
+
+		// Sets property to header field
+		httpConnection.setRequestProperty("METHOD", "POST");
+
+		/* Return code from HTTP server */
+		int responseCode = 0;
+		try {
+			responseCode = httpConnection.getResponseCode();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+
+		if (responseCode == HttpURLConnection.HTTP_OK) {
+
+			MultipartEntity multipartEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+			// MultipartEntity multipartEntity = new MultipartEntity();
+
+			try {
+				StringBody image_id = new StringBody(Integer.toString(message
+						.getItemId()));
+				multipartEntity.addPart(ARG_COMMENT_ITEMID, image_id);
+
+				StringBody content = new StringBody(message.getComment(),
+						Charset.forName(HTTP.UTF_8));
+				multipartEntity.addPart(ARG_COMMENT_CONTENT, content);
+
+				StringBody username = new StringBody(FeedActivity.getUsername());
+				multipartEntity.addPart(ARG_USERNAME, username);
+
+				StringBody token = new StringBody(FeedActivity.getToken());
+				multipartEntity.addPart(ARG_TOKEN, token);
+
+			} catch (UnsupportedEncodingException e) {
+				Log.e(LOG_TAG, "StringBody failure", e);
+				e.printStackTrace();
+			}
+
+			HttpPost httpPost = new HttpPost(WEBSERVER_URL + POST_COMMENT_PATH);
+
+			httpPost.setEntity(multipartEntity);
+
+			// TODO: Add HttpResponse response for response handling
+			try {
+				client.execute(httpPost);
+
+			} catch (ClientProtocolException e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			}
+		}
+		/* Clean up */
+		httpConnection.disconnect();
+
 	}
 }
