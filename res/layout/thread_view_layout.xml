@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical" android:id="@+id/image_view">
+	android:orientation="vertical" android:id="@+id/thread_view">
 	
-	<include android:id="@+id/image_view_header"  layout="@layout/header" />
+	<include android:id="@+id/header"  layout="@layout/header_layout" />
 	
 	<ListView android:layout_width="fill_parent" android:id="@+android:id/list" android:layout_height="fill_parent"></ListView>
 </LinearLayout>

@@ -1,6 +1,5 @@
 package com.kistalk.android.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,36 +10,43 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import com.kistalk.android.activity.KisTalk;
-import com.kistalk.android.base.UserMessage;
+import org.apache.http.protocol.HTTP;
+
+import com.kistalk.android.activity.FeedActivity;
+import com.kistalk.android.base.KT_UploadCommentMessage;
+import com.kistalk.android.base.KT_UploadPhotoMessage;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.net.Uri;
 import android.util.Log;
 
-public class AndroidTransferManager implements Constant {
+public class KT_TransferManager implements Constant {
 
 	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
 
-
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
-	final private int UPLOAD_IMAGE_QUALITY = 75;
+
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
 
 	/* Default constructor */
-	public AndroidTransferManager() {
+	public KT_TransferManager() {
 		client = new DefaultHttpClient();
 		try {
-			urlObject = new URL(WEBSERVER);
+			urlObject = new URL(WEBSERVER_URL);
 		} catch (MalformedURLException e) {
 			Log.e("Bad URL", e.toString());
 		}
@@ -81,7 +87,7 @@ public class AndroidTransferManager implements Constant {
 				Bitmap image = BitmapFactory.decodeStream(inStream);
 
 				File pathToImage = File.createTempFile("image", ".jpg",
-						KisTalk.cacheDir);
+						FeedActivity.cacheDir);
 
 				Log.i(LOG_TAG, pathToImage.getPath() + " filesize is: "
 						+ pathToImage.length());
@@ -110,18 +116,20 @@ public class AndroidTransferManager implements Constant {
 	 * 
 	 * @param message
 	 */
-	public void uploadMessage(UserMessage message) {
-		
+	public void uploadMessage(KT_UploadPhotoMessage message) {
+
 		/* Error check */
 		if (message == null) {
 			Log.e(LOG_TAG, "Bad upload message");
 			throw new NullPointerException();
 		}
-		
+
 		HttpURLConnection httpConnection = null;
 		try {
-			httpConnection = (HttpURLConnection) urlObject
-					.openConnection(); 		 //Opens a bi-directional connection
+			httpConnection = (HttpURLConnection) urlObject.openConnection(); // Opens
+																				// a
+																				// bi-directional
+																				// connection
 		} catch (IOException e) {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
@@ -141,51 +149,47 @@ public class AndroidTransferManager implements Constant {
 		} catch (IOException e) {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
-		} 
-		
+		}
+
 		if (responseCode == HttpURLConnection.HTTP_OK) {
-			
-			ByteArrayOutputStream byteArrayOutStream = new ByteArrayOutputStream();
-			Bitmap imageSend = readImageFromLocation(message.getImagePath());
 
-			/* Error check */
-			if (imageSend == null) {
-				Log.e(LOG_TAG, "Unable to read image");
-				throw new NullPointerException();
-			}
+			MultipartEntity multipartEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+			// MultipartEntity multipartEntity = new MultipartEntity();
 
-			/*
-			 * Compresses the image of format JPEG with specified image quality
-			 * to an output stream
-			 */
-			imageSend.compress(Bitmap.CompressFormat.JPEG,
-					UPLOAD_IMAGE_QUALITY, byteArrayOutStream);
-			byte[] data = byteArrayOutStream.toByteArray(); // Converts the
-															// stream's
-															// contents
-															// to a byte
-															// array
+			FileBody fileBody = new FileBody(new File(message.getImagePath()));
 
-
-			ByteArrayBody imageDataArray = new ByteArrayBody(data, null);
 			StringBody imageDescription = null;
 			try {
-				imageDescription = new StringBody(message.getComment());
+				imageDescription = new StringBody(message.getComment(),
+						Charset.forName(HTTP.UTF_8));
 			} catch (UnsupportedEncodingException e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
 			}
 
-			MultipartEntity multipartEntity = new MultipartEntity();
-			multipartEntity.addPart("", imageDataArray);
-			multipartEntity.addPart("", imageDescription);
+			try {
+				StringBody username = new StringBody(FeedActivity.getUsername());
+				multipartEntity.addPart(ARG_USERNAME, username);
+				StringBody token = new StringBody(FeedActivity.getToken());
+				multipartEntity.addPart(ARG_TOKEN, token);
+			} catch (UnsupportedEncodingException e) {
+				Log.e(LOG_TAG, "StringBody failure", e);
+				e.printStackTrace();
+			}
 
-			HttpPost httpPost = new HttpPost(WEBSERVER);
+			multipartEntity.addPart(ARG_UPLOAD_IMAGE, fileBody);
+
+			multipartEntity.addPart(ARG_UPLOAD_DESCRIPTION, imageDescription);
+
+			HttpPost httpPost = new HttpPost(WEBSERVER_URL + UPLOAD_IMAGE_PATH);
+
 			httpPost.setEntity(multipartEntity);
 
-			// Add HttpResponse response for response handling
+			// TODO: Add HttpResponse response for response handling
 			try {
 				client.execute(httpPost);
+
 			} catch (ClientProtocolException e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -193,16 +197,8 @@ public class AndroidTransferManager implements Constant {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
 			}
-
-			/* Clean up */
-			try {
-				byteArrayOutStream.close();
-			} catch (IOException e) {
-				Log.e(LOG_TAG, e.toString());
-				e.printStackTrace();
-			}
 		}
-		/* Clean up*/
+		/* Clean up */
 		httpConnection.disconnect();
 	}
 
@@ -220,8 +216,92 @@ public class AndroidTransferManager implements Constant {
 	public static InputStream getXMLFile() throws URISyntaxException,
 			ClientProtocolException, IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpGet method = new HttpGet(new URI(ANDROID_XML_FILE));
+
+		Uri uri = new Uri.Builder().scheme(SCHEME).authority(HOST)
+				.path(XML_FILE_PATH)
+				.appendQueryParameter(ARG_USERNAME, FeedActivity.getUsername())
+				.appendQueryParameter(ARG_TOKEN, FeedActivity.getToken())
+				.build();
+
+		HttpGet method = new HttpGet(new URI(uri.toString()));
+
 		HttpResponse res = client.execute(method);
 		return res.getEntity().getContent();
+	}
+
+	public void uploadComment(KT_UploadCommentMessage message) {
+		/* Error check */
+		if (message == null) {
+			Log.e(LOG_TAG, "Bad comment message");
+			throw new NullPointerException();
+		}
+
+		HttpURLConnection httpConnection = null;
+		try {
+			httpConnection = (HttpURLConnection) urlObject.openConnection();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+		// All bytes must be transmitted as a whole package
+		httpConnection.setChunkedStreamingMode(0);
+
+		// Sets property to header field
+		httpConnection.setRequestProperty("METHOD", "POST");
+
+		/* Return code from HTTP server */
+		int responseCode = 0;
+		try {
+			responseCode = httpConnection.getResponseCode();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+
+		if (responseCode == HttpURLConnection.HTTP_OK) {
+
+			MultipartEntity multipartEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+			// MultipartEntity multipartEntity = new MultipartEntity();
+
+			try {
+				StringBody image_id = new StringBody(Integer.toString(message
+						.getItemId()));
+				multipartEntity.addPart(ARG_COMMENT_ITEMID, image_id);
+
+				StringBody content = new StringBody(message.getComment(),
+						Charset.forName(HTTP.UTF_8));
+				multipartEntity.addPart(ARG_COMMENT_CONTENT, content);
+
+				StringBody username = new StringBody(FeedActivity.getUsername());
+				multipartEntity.addPart(ARG_USERNAME, username);
+
+				StringBody token = new StringBody(FeedActivity.getToken());
+				multipartEntity.addPart(ARG_TOKEN, token);
+
+			} catch (UnsupportedEncodingException e) {
+				Log.e(LOG_TAG, "StringBody failure", e);
+				e.printStackTrace();
+			}
+
+			HttpPost httpPost = new HttpPost(WEBSERVER_URL + POST_COMMENT_PATH);
+
+			httpPost.setEntity(multipartEntity);
+
+			// TODO: Add HttpResponse response for response handling
+			try {
+				client.execute(httpPost);
+
+			} catch (ClientProtocolException e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			}
+		}
+		/* Clean up */
+		httpConnection.disconnect();
+
 	}
 }

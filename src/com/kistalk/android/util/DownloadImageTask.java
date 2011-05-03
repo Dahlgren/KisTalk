@@ -36,7 +36,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Uri> {
 	
 	@Override
 	protected Uri doInBackground(String... downloadLinks) {
-		AndroidTransferManager transferManager = new AndroidTransferManager();
+		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = downloadLinks.length;
 		int index = 0;
 		Uri locationToFile = null;
