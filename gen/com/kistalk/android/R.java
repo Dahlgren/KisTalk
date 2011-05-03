@@ -11,57 +11,59 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int failed_to_download=0x7f020000;
-        public static final int ic_menu_camera=0x7f020001;
-        public static final int ic_menu_refresh=0x7f020002;
-        public static final int ic_menu_upload=0x7f020003;
-        public static final int icon=0x7f020004;
-        public static final int image_placeholder=0x7f020005;
-        public static final int logo=0x7f020006;
-        public static final int menuitem_background_focus=0x7f020007;
-        public static final int menuitem_background_pressed=0x7f020008;
+        public static final int app_background=0x7f020000;
+        public static final int bg=0x7f020001;
+        public static final int failed_to_download=0x7f020002;
+        public static final int ic_menu_camera=0x7f020003;
+        public static final int ic_menu_refresh=0x7f020004;
+        public static final int ic_menu_upload=0x7f020005;
+        public static final int icon=0x7f020006;
+        public static final int image_placeholder=0x7f020007;
+        public static final int logo=0x7f020008;
+        public static final int menuitem_background_focus=0x7f020009;
+        public static final int menuitem_background_pressed=0x7f02000a;
     }
     public static final class id {
-        public static final int avatar=0x7f050003;
-        public static final int choose_button=0x7f050015;
-        public static final int choose_focus_bg=0x7f050016;
-        public static final int com_left_column=0x7f050002;
-        public static final int com_right_column=0x7f050005;
-        public static final int comment=0x7f050006;
-        public static final int comment_button=0x7f05001c;
-        public static final int comment_item=0x7f050000;
-        public static final int comments_info=0x7f05000d;
-        public static final int date=0x7f050007;
-        public static final int description=0x7f05000c;
-        public static final int feed_view=0x7f050010;
-        public static final int frameLayout1=0x7f050001;
-        public static final int header=0x7f050011;
-        public static final int image=0x7f05000b;
-        public static final int image_holder=0x7f05001e;
-        public static final int inputbox=0x7f05001b;
-        public static final int label=0x7f05001a;
-        public static final int left_column=0x7f050009;
-        public static final int linearLayout1=0x7f05001f;
-        public static final int linearLayout2=0x7f050022;
-        public static final int linearLayout3=0x7f050020;
-        public static final int logo=0x7f050012;
-        public static final int num_of_comments=0x7f05000e;
-        public static final int refresh_button=0x7f050017;
-        public static final int refresh_focus_bg=0x7f050018;
-        public static final int right_column=0x7f05000a;
-        public static final int scroll_view=0x7f050025;
-        public static final int send_button=0x7f050027;
-        public static final int spacer=0x7f050021;
-        public static final int status_feed_item=0x7f050008;
-        public static final int text_comments=0x7f05000f;
-        public static final int thread_comment_form=0x7f050019;
-        public static final int thread_feed_item=0x7f05001d;
-        public static final int thread_view=0x7f050023;
-        public static final int upload_button=0x7f050013;
-        public static final int upload_focus_bg=0x7f050014;
-        public static final int upload_image=0x7f050026;
-        public static final int upload_view=0x7f050024;
-        public static final int user_name=0x7f050004;
+        public static final int avatar=0x7f060003;
+        public static final int choose_button=0x7f060015;
+        public static final int choose_focus_bg=0x7f060016;
+        public static final int com_left_column=0x7f060002;
+        public static final int com_right_column=0x7f060005;
+        public static final int comment=0x7f060006;
+        public static final int comment_button=0x7f06001c;
+        public static final int comment_item=0x7f060000;
+        public static final int comments_info=0x7f06000d;
+        public static final int date=0x7f060007;
+        public static final int description=0x7f06000c;
+        public static final int feed_view=0x7f060010;
+        public static final int frameLayout1=0x7f060001;
+        public static final int header=0x7f060011;
+        public static final int image=0x7f06000b;
+        public static final int image_holder=0x7f06001e;
+        public static final int inputbox=0x7f06001b;
+        public static final int label=0x7f06001a;
+        public static final int left_column=0x7f060009;
+        public static final int linearLayout1=0x7f06001f;
+        public static final int linearLayout2=0x7f060022;
+        public static final int linearLayout3=0x7f060020;
+        public static final int logo=0x7f060012;
+        public static final int num_of_comments=0x7f06000e;
+        public static final int refresh_button=0x7f060017;
+        public static final int refresh_focus_bg=0x7f060018;
+        public static final int right_column=0x7f06000a;
+        public static final int scroll_view=0x7f060025;
+        public static final int send_button=0x7f060027;
+        public static final int spacer=0x7f060021;
+        public static final int status_feed_item=0x7f060008;
+        public static final int text_comments=0x7f06000f;
+        public static final int thread_comment_form=0x7f060019;
+        public static final int thread_feed_item=0x7f06001d;
+        public static final int thread_view=0x7f060023;
+        public static final int upload_button=0x7f060013;
+        public static final int upload_focus_bg=0x7f060014;
+        public static final int upload_image=0x7f060026;
+        public static final int upload_view=0x7f060024;
+        public static final int user_name=0x7f060004;
     }
     public static final class layout {
         public static final int comment_item_layout=0x7f030000;
@@ -83,5 +85,10 @@ public final class R {
         public static final int upload_photo=0x7f040001;
         public static final int upload_send_button=0x7f040007;
         public static final int upload_type_comment=0x7f040006;
+    }
+    public static final class style {
+        public static final int TransparentExpandableListView=0x7f050002;
+        public static final int TransparentListView=0x7f050001;
+        public static final int app_theme=0x7f050000;
     }
 }

@@ -25,11 +25,11 @@ import android.widget.ImageView;
  * */
 
 /* The parameters are of the type ContentValues and the result is of type String */
-public class DownloadImageTask extends AsyncTask<String, Void, Uri> {
+public class DownloadImageTask_NOT_USED extends AsyncTask<String, Void, Uri> {
 	
 	private ImageView view;
 	
-	public DownloadImageTask(ImageView view) {
+	public DownloadImageTask_NOT_USED(ImageView view) {
 		//super(); // ta bort
 		this.view = view;
 	}

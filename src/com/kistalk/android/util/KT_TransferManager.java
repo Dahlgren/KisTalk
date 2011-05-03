@@ -35,8 +35,6 @@ import android.util.Log;
 
 public class KT_TransferManager implements Constant {
 
-	private final static String LOG_TAG = "util.KisTalk.AndroidTransferManager";
-
 	final private int DOWNLOAD_IMAGE_QUALITY = 95;
 
 	private DefaultHttpClient client;
@@ -76,7 +74,8 @@ public class KT_TransferManager implements Constant {
 			return null;
 		}
 
-		Log.i(LOG_TAG, "Downloading image at: " + url);
+		Log.i(LOG_TAG, KT_TransferManager.class + ": Downloading image at: "
+				+ url);
 		try {
 			HttpURLConnection httpConnection = (HttpURLConnection) url
 					.openConnection();
@@ -89,12 +88,15 @@ public class KT_TransferManager implements Constant {
 				File pathToImage = File.createTempFile("image", ".jpg",
 						FeedActivity.cacheDir);
 
-				Log.i(LOG_TAG, pathToImage.getPath() + " filesize is: "
-						+ pathToImage.length());
-
 				FileOutputStream fos = new FileOutputStream(pathToImage);
-				image.compress(Bitmap.CompressFormat.JPEG,
-						DOWNLOAD_IMAGE_QUALITY, fos);
+
+				if (!image.compress(Bitmap.CompressFormat.JPEG,
+						DOWNLOAD_IMAGE_QUALITY, fos))
+					Log.e(LOG_TAG, KT_TransferManager.class
+							+ ": Error when compressing file");
+
+				Log.i(LOG_TAG, KT_TransferManager.class
+						+ ": Downloaded image to: " + pathToImage);
 
 				/* Clean up */
 				inStream.close();
@@ -103,9 +105,9 @@ public class KT_TransferManager implements Constant {
 
 				return Uri.fromFile(pathToImage);
 			} else
-				Log.w(LOG_TAG, "Connection couldn't be established");
+				Log.w(LOG_TAG, "Connection couldn't be established for " + url);
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "ERROR in downloading", e);
+			Log.e(LOG_TAG, "ERROR when downloading " + url, e);
 		}
 
 		return null;

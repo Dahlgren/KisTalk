@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.ImageView;
 
 public class ImageLoaderHandler extends Handler implements Constant {
@@ -34,23 +35,11 @@ public class ImageLoaderHandler extends Handler implements Constant {
 			for (ImageView imageView : imageViews)
 				imageView.setImageResource(resource);
 		}
+		else
+			Log.e(LOG_TAG, ImageLoaderHandler.class.toString() + ": bad message");
 	}
 
 	public void addViews(ImageView imageView) {
 		imageViews.add(imageView);
 	}
-
-	/**
-	 * Override this method if you need custom handler logic. Note that this
-	 * method can actually be called directly for performance reasons, in which
-	 * case the message will be null
-	 * 
-	 * @param bitmap
-	 *            the bitmap returned from the image loader
-	 * @param msg
-	 *            the handler message; can be null
-	 * @return true if the view was updated with the new image, false if it was
-	 *         discarded
-	 */
-
 }
