@@ -1,7 +1,6 @@
 package com.kistalk.android.util;
 
 import com.kistalk.android.base.KT_UploadCommentMessage;
-import com.kistalk.android.base.KT_UploadPhotoMessage;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
