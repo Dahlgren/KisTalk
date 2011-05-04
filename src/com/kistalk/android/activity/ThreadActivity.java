@@ -57,7 +57,7 @@ public class ThreadActivity extends ListActivity implements Constant {
 		super.onDestroy();
 	}
 
-	private void addImageAsHeader() {
+	private synchronized void addImageAsHeader() {
 		// instantiate thread feed item layout
 		View imageItem = getLayoutInflater().inflate(
 				R.layout.thread_feed_item_layout, null);
@@ -88,7 +88,7 @@ public class ThreadActivity extends ListActivity implements Constant {
 		getListView().addHeaderView(imageItem);
 	}
 
-	private void populateList() {
+	private synchronized void populateList() {
 
 		Cursor cur = FeedActivity.dbAdapter.fetchComments(itemId);
 
@@ -104,7 +104,7 @@ public class ThreadActivity extends ListActivity implements Constant {
 		setListAdapter(adapter);
 	}
 
-	private void addCommentForm() {
+	private synchronized void addCommentForm() {
 		View commentForm = getLayoutInflater().inflate(
 				R.layout.thread_comment_form_layout, null);
 		

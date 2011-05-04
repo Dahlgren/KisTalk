@@ -2,6 +2,7 @@
 package com.kistalk.android.util;
 
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,8 +36,8 @@ public class DbAdapter implements Constant {
 			+ " integer primary key autoincrement, " + KEY_ITEM_ID
 			+ " integer not null, " + KEY_COM_ID + " integer not null, "
 			+ KEY_COM_USER_ID + " integer, " + KEY_COM_USER_NAME + " text, "
-			+ KEY_COM_USER_AVATAR + " text, "
-			+ KEY_COM_CONTENT + " text, " + KEY_COM_DATE + " text);";
+			+ KEY_COM_USER_AVATAR + " text, " + KEY_COM_CONTENT + " text, "
+			+ KEY_COM_DATE + " text);";
 
 	/*
 	 * Instance variables
@@ -45,6 +46,9 @@ public class DbAdapter implements Constant {
 	private SQLiteDatabase mDb;
 	private Context mCtx;
 
+	private Semaphore semMDB = new Semaphore(1);
+	private Semaphore semMDBHelper = new Semaphore(1);
+	
 	/*
 	 * Private static class DatabaseHelper which manages creation and upgrading
 	 * of database
@@ -64,8 +68,8 @@ public class DbAdapter implements Constant {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
+			Log.w(LOG_TAG, "Upgrading database from version " + oldVersion
+					+ " to " + newVersion + ", which will destroy all old data");
 			dropDbTables(db);
 			onCreate(db);
 		}
@@ -83,6 +87,7 @@ public class DbAdapter implements Constant {
 	public DbAdapter open() throws SQLException {
 		mDbHelper = new DatabaseHelper(mCtx);
 		mDb = mDbHelper.getWritableDatabase();
+
 		return this;
 	}
 
@@ -91,50 +96,86 @@ public class DbAdapter implements Constant {
 	}
 
 	public void insertComments(LinkedList<ContentValues> comments) {
+		SQLiteDatabase sqDB = lockAndGetDBPointer();
 		for (ContentValues comment : comments)
-			mDb.insert(DB_TABLE_COMMENTS, null, comment);
+			sqDB.insert(DB_TABLE_COMMENTS, null, comment);
+		unlockDBPointer();
 	}
 
 	public void insertPost(ContentValues post) {
-		if (mDb.insert(DB_TABLE_POSTS, null, post) == -1)
+		SQLiteDatabase sqDB = lockAndGetDBPointer();
+		if (sqDB.insert(DB_TABLE_POSTS, null, post) == -1)
 			Log.e(LOG_TAG, "Error while inserting post to db");
+		unlockDBPointer();
 	}
 
 	public boolean deleteNote(long rowId) {
-		return mDb.delete(DB_TABLE_POSTS, KEY_ROWID + "=" + rowId, null) > 0;
+		SQLiteDatabase sqDB = lockAndGetDBPointer();
+
+		if (sqDB.delete(DB_TABLE_POSTS, KEY_ROWID + "=" + rowId, null) > 0) {
+			unlockDBPointer();
+			return true;
+		} else {
+			unlockDBPointer();
+			return false;
+		}
 	}
 
 	public void deleteAll() {
-		mDb.delete(DB_TABLE_POSTS, null, null);
-		mDb.delete(DB_TABLE_COMMENTS, null, null);
+		SQLiteDatabase sqDB = lockAndGetDBPointer();
+		
+		sqDB.delete(DB_TABLE_POSTS, null, null);
+		sqDB.delete(DB_TABLE_COMMENTS, null, null);
+		
+		unlockDBPointer();
 	}
 
-	public synchronized Cursor fetchAllPosts() {
-		return mDb.query(DB_TABLE_POSTS, null, null, null, null, null, null);
+	public Cursor fetchAllPosts() {
+		Cursor cur = lockAndGetDBPointer().query(DB_TABLE_POSTS, null, null, null, null, null, null);
+		unlockDBPointer();
+		return cur;
 	}
 
 	public Cursor fetchComments(int itemId) {
-		return mDb.query(DB_TABLE_COMMENTS, null, KEY_ITEM_ID + "=" + itemId,
+		Cursor cur = lockAndGetDBPointer().query(DB_TABLE_COMMENTS, null, KEY_ITEM_ID + "=" + itemId,
 				null, null, null, null);
+		unlockDBPointer();
+		return cur;
 	}
 
 	public Cursor fetchPost(long rowId) throws SQLException {
 
-		Cursor mCursor = mDb.query(true, DB_TABLE_POSTS, null, KEY_ROWID + "="
+		Cursor mCursor = lockAndGetDBPointer().query(true, DB_TABLE_POSTS, null, KEY_ROWID + "="
 				+ rowId, null, null, null, null, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
+		unlockDBPointer();
 		return mCursor;
 	}
 
 	public Cursor fetchPostFromId(long itemId) throws SQLException {
 
-		Cursor mCursor = mDb.query(true, DB_TABLE_POSTS, null, KEY_ITEM_ID
+		Cursor mCursor = lockAndGetDBPointer().query(true, DB_TABLE_POSTS, null, KEY_ITEM_ID
 				+ "=" + itemId, null, null, null, null, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
+		unlockDBPointer();
 		return mCursor;
+	}
+
+	private synchronized SQLiteDatabase lockAndGetDBPointer() {
+		try {
+			semMDB.acquire();
+		} catch (InterruptedException e) {
+			Log.e(LOG_TAG, "The acquire of semaphore was interrupted!");
+			e.printStackTrace();
+		}
+		return mDb;
+	}
+
+	private void unlockDBPointer() {
+		semMDB.release();
 	}
 }
