@@ -1,9 +1,0 @@
-bin/
-gen/
-!bin/KisTalk_clone.apk
-.classpath
-.project
-.gitignore
-.DS_Store
-default.properties
-proguard.cfg
