@@ -3,11 +3,9 @@ package com.kistalk.android.activity;
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.KT_UploadCommentMessage;
-import com.kistalk.android.base.KT_UploadPhotoMessage;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.ImageLoader;
 import com.kistalk.android.util.UploadCommentTask;
-import com.kistalk.android.util.UploadPhotoTask;
 
 import android.app.ListActivity;
 import android.database.Cursor;
@@ -16,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class ThreadActivity extends ListActivity implements Constant {

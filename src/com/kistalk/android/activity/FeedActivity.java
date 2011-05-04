@@ -268,30 +268,6 @@ public class FeedActivity extends ListActivity implements Constant {
 						takePhotoAction();
 					}
 				});
-
-		// findViewById(R.id.upload_button).setOnClickListener(
-		// new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		//
-		// Uri uri = Uri
-		// .fromFile(new File(
-		// "/data/data/com.kistalk.android/cache/img1_200.jpg"));
-		// // dialog(getFilesDir().toString());
-		// // dialog(uri.toString());
-		//
-		// ((ImageView) findViewById(R.id.temp_image))
-		// .setImageURI(uri);
-		//
-		// // dbAdapter.insert(uri, "Desc3: Äpplen är goda!",
-		// // "Anders", "Igår");
-		// // populateList();
-		// // iv.setI
-		//
-		// }
-		// });
-
 	}
 
 	private void showFileChooser() {
@@ -303,17 +279,6 @@ public class FeedActivity extends ListActivity implements Constant {
 	private void takePhotoAction() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		startActivityForResult(intent, GET_CAMERA_PIC_REQUEST);
-		// File pathToImage = null;
-		//
-		// try {
-		// pathToImage = File.createTempFile("image", ".jpg",
-		// KisTalk.cacheDir);
-		// } catch (IOException e) {
-		// Log.e(LOG_TAG, e.toString());
-		// }
-
-		// Uri tempUri = Uri.fromFile(pathToImage);
-		// intent.putExtra(MediaStore.EXTRA_OUTPUT, pathToImage);
 	}
 
 	private void showComments(int itemId) {
