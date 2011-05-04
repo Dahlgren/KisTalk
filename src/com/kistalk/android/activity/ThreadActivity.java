@@ -29,16 +29,41 @@ public class ThreadActivity extends ListActivity implements Constant {
 		itemId = getIntent().getIntExtra(KEY_ITEM_ID, 0);
 		setContentView(R.layout.thread_view_layout);
 		addImageAsHeader();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		FeedActivity.dbAdapter.open();
 		populateList();
 		addCommentForm();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		FeedActivity.dbAdapter.close();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 
 	private void addImageAsHeader() {
 		// instantiate thread feed item layout
 		View imageItem = getLayoutInflater().inflate(
 				R.layout.thread_feed_item_layout, null);
-
-		FeedActivity.dbAdapter.open();
 
 		// query database
 		Cursor cur = FeedActivity.dbAdapter.fetchPostFromId(itemId);
@@ -64,13 +89,9 @@ public class ThreadActivity extends ListActivity implements Constant {
 
 		// add view as header to list
 		getListView().addHeaderView(imageItem);
-
-		FeedActivity.dbAdapter.close();
-
 	}
 
 	private void populateList() {
-		FeedActivity.dbAdapter.open();
 
 		Cursor cur = FeedActivity.dbAdapter.fetchComments(itemId);
 
@@ -84,8 +105,6 @@ public class ThreadActivity extends ListActivity implements Constant {
 				R.layout.comment_item_layout, cur, displayFields, displayViews);
 
 		setListAdapter(adapter);
-
-		FeedActivity.dbAdapter.close();
 	}
 
 	private void addCommentForm() {

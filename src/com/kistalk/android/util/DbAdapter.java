@@ -109,7 +109,7 @@ public class DbAdapter implements Constant {
 		mDb.delete(DB_TABLE_COMMENTS, null, null);
 	}
 
-	public Cursor fetchAllPosts() {
+	public synchronized Cursor fetchAllPosts() {
 		return mDb.query(DB_TABLE_POSTS, null, null, null, null, null, null);
 	}
 

@@ -1,6 +1,5 @@
 package com.kistalk.android.util;
 
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -97,7 +96,8 @@ public class ImageLoader implements Runnable, Constant {
 	 */
 
 	public static void clearCache() {
-		imageCache.clear();
+		if (imageCache != null)
+			imageCache.clear();
 	}
 
 	/**

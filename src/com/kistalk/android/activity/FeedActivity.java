@@ -10,6 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.FeedItem;
+import com.kistalk.android.util.ImageLoader;
 import com.kistalk.android.util.KT_XMLParser;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
@@ -72,14 +73,40 @@ public class FeedActivity extends ListActivity implements Constant {
 		setOnClickListeners();
 
 		dbAdapter = new DbAdapter(this);
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		dbAdapter.open();
 		populateList();
 		refreshPosts();
+
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		dbAdapter.close();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		ImageLoader.clearCache();
 	}
 
 	private void populateList() {
-		dbAdapter.open();
-
 		Cursor cur = dbAdapter.fetchAllPosts();
 
 		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
@@ -93,8 +120,6 @@ public class FeedActivity extends ListActivity implements Constant {
 				R.layout.feed_item_layout, cur, displayFields, displayViews);
 
 		setListAdapter(adapter);
-
-		dbAdapter.close();
 	}
 
 	@Override
@@ -322,9 +347,6 @@ public class FeedActivity extends ListActivity implements Constant {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				dbAdapter.open();
-				dbAdapter.deleteAll();
-
 				try {
 					LinkedList<FeedItem> feedItems = KT_XMLParser
 							.fetchAndParse();
@@ -332,6 +354,8 @@ public class FeedActivity extends ListActivity implements Constant {
 						Log.e(LOG_TAG, "Problem when downloading XML file");
 						return null;
 					}
+
+					dbAdapter.deleteAll();
 
 					for (FeedItem feedItem : feedItems) {
 						dbAdapter.insertPost(feedItem.post);
@@ -345,7 +369,6 @@ public class FeedActivity extends ListActivity implements Constant {
 					Log.e(LOG_TAG, "" + e, e);
 				}
 
-				dbAdapter.close();
 				return null;
 			}
 
