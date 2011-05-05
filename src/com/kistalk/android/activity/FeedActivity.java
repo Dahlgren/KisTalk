@@ -10,6 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.FeedItem;
+import com.kistalk.android.util.DBLoader;
 import com.kistalk.android.util.ImageLoader;
 import com.kistalk.android.util.KT_TransferManager;
 import com.kistalk.android.util.KT_XMLParser;
@@ -24,7 +25,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -37,10 +37,13 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class FeedActivity extends ListActivity implements Constant {
+	
+	private DBLoader dbLoader;
 
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
+
 
 	private static String username;
 	private static String token;
@@ -81,6 +84,8 @@ public class FeedActivity extends ListActivity implements Constant {
 				refreshPosts();
 			}
 		}
+
+		dbLoader = new DBLoader(this); //Starts a new thread executor
 	}
 
 	@Override
@@ -111,7 +116,7 @@ public class FeedActivity extends ListActivity implements Constant {
 		dbAdapter.close();
 	}
 
-	private void populateList() {
+	public void populateList() {
 		Cursor cur = dbAdapter.fetchAllPosts();
 
 		String[] displayFields = new String[] { KEY_ITEM_USER_NAME,
@@ -312,8 +317,42 @@ public class FeedActivity extends ListActivity implements Constant {
 		}
 	}
 
-	protected void refreshPosts() {
+	private void refreshPosts() {
+		
+//		dbLoader.start(dbAdapter);
+		
+		try {
+			LinkedList<FeedItem> feedItems = KT_XMLParser
+					.fetchAndParse();
+			if (feedItems == null) {
+				Log.e(LOG_TAG, "Problem when downloading XML file");
+			}
 
+			dbAdapter.deleteAll();
+
+			for (FeedItem feedItem : feedItems) {
+				dbAdapter.insertPost(feedItem.post);
+				dbAdapter.insertComments(feedItem.comments);
+			}
+		} catch (XmlPullParserException e) {
+			Log.e(LOG_TAG, "" + e, e);
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "" + e, e);
+		} catch (URISyntaxException e) {
+			Log.e(LOG_TAG, "" + e, e);
+		}
+		
+		populateList();
+		
+		
+//		DBLoader.start(this, this.dbAdapter);
+/*
+		dbSerialExecutor = new DBSerialExecutor(this);
+		Thread dbThread = new Thread(new DBThread(dbAdapter, dbSerialExecutor));
+		dbSerialExecutor.addTask(dbThread);
+		dbSerialExecutor.start();
+*/
+/*		
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
@@ -347,7 +386,7 @@ public class FeedActivity extends ListActivity implements Constant {
 				populateList();
 			}
 		}.execute((Void[]) null);
-
+*/
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
