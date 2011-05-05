@@ -23,7 +23,7 @@ import android.widget.ImageView;
 public class ImageLoader implements Runnable, Constant {
 
 	// the default thread pool size
-	private static final int DEFAULT_POOL_SIZE = 3;
+	private static final int DEFAULT_POOL_SIZE = 1;
 
 	private static ThreadPoolExecutor executor;
 	private static ImageCache imageCache;

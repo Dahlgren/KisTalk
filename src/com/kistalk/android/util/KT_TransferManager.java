@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import org.apache.http.HttpConnection;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -305,5 +306,63 @@ public class KT_TransferManager implements Constant {
 		/* Clean up */
 		httpConnection.disconnect();
 
+	}
+
+	public boolean validate(String username, String token) {
+		if (testConnection()) {
+
+			Uri uri = new Uri.Builder().scheme(SCHEME).authority(HOST)
+					.path(VALIDATE_CREDENTIAL_PATH)
+					.appendQueryParameter(ARG_USERNAME, username)
+					.appendQueryParameter(ARG_TOKEN, token).build();
+
+			try {
+				HttpPost method = new HttpPost(new URI(uri.toString()));
+				HttpResponse res = client.execute(method);
+
+				if (res.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK)
+					return true;
+
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	private boolean testConnection() {
+
+		HttpURLConnection httpConnection = null;
+		try {
+			httpConnection = (HttpURLConnection) urlObject.openConnection();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+		// All bytes must be transmitted as a whole package
+		httpConnection.setChunkedStreamingMode(0);
+
+		// Sets property to header field
+		httpConnection.setRequestProperty("METHOD", "POST");
+
+		/* Return code from HTTP server */
+		int responseCode = 0;
+		try {
+			responseCode = httpConnection.getResponseCode();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.toString());
+			e.printStackTrace();
+		}
+
+		if (responseCode == HttpURLConnection.HTTP_OK)
+			return true;
+		else {
+			httpConnection.disconnect();
+			return false;
+		}
 	}
 }

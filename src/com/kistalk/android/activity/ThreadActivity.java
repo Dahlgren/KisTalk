@@ -10,6 +10,7 @@ import com.kistalk.android.util.UploadCommentTask;
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -27,31 +28,38 @@ public class ThreadActivity extends ListActivity implements Constant {
 		setContentView(R.layout.thread_view_layout);
 		addImageAsHeader();
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		FeedActivity.dbAdapter.open();
 		populateList();
 		addCommentForm();
+		((EditText) findViewById(R.id.inputbox))
+				.setText((String) getLastNonConfigurationInstance());
+
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
-		FeedActivity.dbAdapter.close();
 	}
-	
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		//return super.onRetainNonConfigurationInstance();
+		return ((EditText) findViewById(R.id.inputbox)).getText().toString();
+	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -107,7 +115,7 @@ public class ThreadActivity extends ListActivity implements Constant {
 	private void addCommentForm() {
 		View commentForm = getLayoutInflater().inflate(
 				R.layout.thread_comment_form_layout, null);
-		
+
 		getListView().addFooterView(commentForm);
 
 		commentForm.findViewById(R.id.comment_button).setOnClickListener(

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KisTalk</string>
-    <string name="upload_photo">Camera</string>
-    <string name="choose_picture">Choose</string>
-    <string name="empty">No items</string>
-    <string name="refresh">Refresh</string>
-    <string name="comments">&#160;comments</string>
-    <string name="upload_type_comment">Type your comment here: </string>
-    <string name="upload_send_button">Send</string>
-    <string name="comment">Comment</string>
+	<string name="app_name">KisTalk</string>
+	<string name="upload_photo">Camera</string>
+	<string name="choose_picture">Choose</string>
+	<string name="empty">No items</string>
+	<string name="refresh">Refresh</string>
+	<string name="comments">&#160;comments</string>
+	<string name="upload_type_comment">Type your comment here: </string>
+	<string name="upload_send_button">Send</string>
+	<string name="comment">Comment</string>
+	<string name="KTH_ID">KTH-ID</string>
+	<string name="login_header">Login to KisTalk</string>
+	<string name="login_description">To login you\'ll need to enter your KTH account
+		username and a token which you can get after registering on
+		www.KisTalk.com. You\'ll find it under \'Profile\'. Either you write
+		the token or you scan it with your installed QR reader</string>
+	<string name="login_label_username">Username (KTH.se account)</string>
+	<string name="login_label_token">Token</string>
+	<string name="login_button_scan_with_qr">Scan token with QR reader</string>
+	<string name="login_button_login">Login</string>
 </resources>

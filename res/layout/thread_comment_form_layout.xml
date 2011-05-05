@@ -6,7 +6,7 @@
 		android:text="@string/upload_type_comment" />
 	<EditText android:id="@+id/inputbox" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:background="@android:drawable/editbox_background"
-		android:layout_below="@id/label" />
+		android:layout_below="@id/label"/>
 	<Button android:layout_below="@id/inputbox"
 		android:layout_alignRight="@id/inputbox" android:layout_width="100px"
 		android:layout_height="wrap_content" android:text="@string/comment" android:id="@+id/comment_button"/>

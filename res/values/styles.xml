@@ -16,4 +16,16 @@
 		<item name="android:cacheColorHint">@android:color/transparent</item>
 	</style>
 
+	<style name="Header_Large" parent="@android:style/TextAppearance.Large">
+	</style>
+
+	<style name="Header_Medium" parent="@android:style/TextAppearance.Medium">
+	</style>
+	
+	<style name="Header_Medium" parent="@android:style/TextAppearance.Medium">
+	</style>
+	
+	<style name="Text_Plain" parent="@android:style/TextAppearance.Small">
+	</style>
+
 </resources>

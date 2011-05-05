@@ -11,6 +11,7 @@ import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.FeedItem;
 import com.kistalk.android.util.ImageLoader;
+import com.kistalk.android.util.KT_TransferManager;
 import com.kistalk.android.util.KT_XMLParser;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.DbAdapter;
@@ -18,6 +19,8 @@ import com.kistalk.android.util.DbAdapter;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
@@ -39,27 +42,14 @@ public class FeedActivity extends ListActivity implements Constant {
 	public static File cacheDir;
 	public static File filesDir;
 
-	private static String username = "zoger";
-	private static String token = "k1igvh1xyg";
-
-	public static String getUsername() {
-		return username;
-	}
-
-	private static void setUsername(String username) {
-		FeedActivity.username = username;
-	}
-
-	public static String getToken() {
-		return token;
-	}
-
-	private static void setToken(String token) {
-		FeedActivity.token = token;
-	}
+	private static String username;
+	private static String token;
 
 	// private instances of classes
 	public static DbAdapter dbAdapter;
+
+	private SharedPreferences sp;
+	private Editor spEditor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -73,15 +63,29 @@ public class FeedActivity extends ListActivity implements Constant {
 		setOnClickListeners();
 
 		dbAdapter = new DbAdapter(this);
+		dbAdapter.open();
+
+		sp = getSharedPreferences("KisTalk", MODE_PRIVATE);
+		// spEditor = sp.edit();
+		username = sp.getString(ARG_USERNAME, null);
+		token = sp.getString(ARG_TOKEN, null);
+
+		if (token == null || username == null)
+			startLoginActivityForResult();
+		else {
+			KT_TransferManager transferManager = new KT_TransferManager();
+			if (!transferManager.validate(username, token))
+				startLoginActivityForResult();
+			else {
+				populateList();
+				refreshPosts();
+			}
+		}
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		dbAdapter.open();
-		populateList();
-		refreshPosts();
-
 	}
 
 	@Override
@@ -97,13 +101,14 @@ public class FeedActivity extends ListActivity implements Constant {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		dbAdapter.close();
+
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		ImageLoader.clearCache();
+		dbAdapter.close();
 	}
 
 	private void populateList() {
@@ -347,20 +352,36 @@ public class FeedActivity extends ListActivity implements Constant {
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		if (resultCode == RESULT_OK) {
+		switch (requestCode) {
+		case LOGIN_REQUEST:
+			if (resultCode == RESULT_OK) {
+				username = intent.getStringExtra(ARG_USERNAME);
+				token = intent.getStringExtra(ARG_TOKEN);
 
-			Uri recievedUri = intent.getData();
-			if (recievedUri != null) {
+				Editor spEditor = sp.edit();
+				spEditor.putString(ARG_USERNAME, username);
+				spEditor.putString(ARG_TOKEN, token);
+				spEditor.commit();
+				ImageLoader.clearCache();
+			} else {
+				finish();
+			}
+			break;
 
-				String realPath = getRealPathFromURI(recievedUri);
-				if (requestCode == GET_CAMERA_PIC_REQUEST) {
-					showUploadView(realPath);
-				}
-				if (requestCode == CHOOSE_IMAGE_REQUEST) {
+		case GET_CAMERA_PIC_REQUEST:
+		case CHOOSE_IMAGE_REQUEST:
+			if (resultCode == RESULT_OK) {
+				Uri recievedUri = intent.getData();
+				if (recievedUri != null) {
+					String realPath = getRealPathFromURI(recievedUri);
 					showUploadView(realPath);
 				}
 			}
+			break;
+		default:
+			break;
 		}
+
 	}
 
 	// Convert the image URI to the direct file system path of the image file
@@ -378,4 +399,26 @@ public class FeedActivity extends ListActivity implements Constant {
 
 		return cursor.getString(column_index);
 	}
+
+	public static String getUsername() {
+		return username;
+	}
+
+	private static void setUsername(String username) {
+		FeedActivity.username = username;
+	}
+
+	public static String getToken() {
+		return token;
+	}
+
+	private static void setToken(String token) {
+		FeedActivity.token = token;
+	}
+
+	private void startLoginActivityForResult() {
+		Intent loginIntent = new Intent(this, LoginActivity.class);
+		startActivityForResult(loginIntent, LOGIN_REQUEST);
+	}
+
 }
