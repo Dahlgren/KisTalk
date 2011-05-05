@@ -28,6 +28,7 @@ public class ImageLoaderHandler extends Handler implements Constant {
 
 	}
 
+	@Override
 	public void handleMessage(Message msg) {
 		imageController.removeHandler(imageUrl);
 

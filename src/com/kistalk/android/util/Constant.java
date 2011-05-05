@@ -6,7 +6,7 @@ public interface Constant {
 	/*
 	 * Intent constants
 	 */
-	public static final int CHOOSE_IMAGE_REQUEST = 1337;
+	public static final int REQUEST_CHOOSE_IMAGE = 1337;
 	public static final int REQUEST_GET_CAMERA_PIC = 1338;	
 	public static final int LOGIN_REQUEST = 1339;
 	public static final int REQUEST_QR_READER = 1340;
@@ -37,6 +37,8 @@ public interface Constant {
 	// Key constants for
 	public static final String KEY_UPLOAD_IMAGE_URI = "KEY_UPLOAD_IMAGE_URI";
 	public static final String KEY_UPLOAD_IMAGE_DESCRIPTION = "KEY_UPLOAD_IMAGE_DESCRIPTION";
+	public static final String KEY_UPLOAD_IMAGE_PATH = "KEY_UPLOAD_IMAGE_PATH";
+	public static final String KEY_UPLOAD_IMAGE_BITMAP = "KEY_UPLOAD_IMAGE_BITMAP";
 
 	// Key constants for ImageLoader, ImageLoaderHandler and ImageCache
 	public static final String KEY_URI = "KEY_URI";
@@ -68,5 +70,13 @@ public interface Constant {
 	
 	public static final String ARG_COMMENT_ITEMID = "image_id";
 	public static final String ARG_COMMENT_CONTENT = "content";
-
+	
+	// Message constants
+	public static final short UPLOAD_PHOTO_MESSAGE_TAG = 0;
+	public static final short UPLOAD_COMMENT_MESSAGE_TAG = 1;
+	
+	// Dialog constants
+	public static final CharSequence[] OPTIONS = {
+			"Choose existing photo", "Capture a photo" };
+	public static final int DIALOG_CHOOSE_OPTION_ID = 11;
 }

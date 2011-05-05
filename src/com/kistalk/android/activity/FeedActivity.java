@@ -2,14 +2,19 @@ package com.kistalk.android.activity;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -19,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,6 +52,8 @@ public class FeedActivity extends ListActivity implements Constant {
 
 	private static String username;
 	private static String token;
+
+	private Uri tempFile;
 
 	// private instances of classes
 	public static DbAdapter dbAdapter;
@@ -164,21 +172,6 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void setFocusListeners() {
-		findViewById(R.id.choose_button).setOnFocusChangeListener(
-				new OnFocusChangeListener() {
-
-					@Override
-					public void onFocusChange(View v, boolean hasFocus) {
-						if (hasFocus)
-							v.findViewById(R.id.choose_focus_bg).setVisibility(
-									View.VISIBLE);
-						else
-							v.findViewById(R.id.choose_focus_bg).setVisibility(
-									View.INVISIBLE);
-
-					}
-				});
-
 		findViewById(R.id.upload_button).setOnFocusChangeListener(
 				new OnFocusChangeListener() {
 
@@ -281,43 +274,65 @@ public class FeedActivity extends ListActivity implements Constant {
 		/*
 		 * Button that allows file uploading of picture
 		 */
-		findViewById(R.id.choose_button).setOnClickListener(
-				new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						showFileChooser();
-					}
-				});
-
 		findViewById(R.id.upload_button).setOnClickListener(
 				new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						takePhotoAction();
+						showDialog(DIALOG_CHOOSE_OPTION_ID);
 					}
 				});
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+		switch (id) {
+		case DIALOG_CHOOSE_OPTION_ID:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Pick an option").setCancelable(true)
+					.setItems(OPTIONS, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int id) {
+							if (0 == id) {
+								showFileChooser();
+							} else if (1 == id) {
+								takePhotoAction();
+							}
+						}
+					});
+			return builder.create();
+
+		default:
+			dialog = null;
+		}
+		return dialog;
 	}
 
 	private void showFileChooser() {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("image/*");
-		startActivityForResult(intent, CHOOSE_IMAGE_REQUEST);
+		startActivityForResult(intent, REQUEST_CHOOSE_IMAGE);
 	}
 
 	private void takePhotoAction() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+		// String filename = "temp.tmp";
+		// ContentValues values = new ContentValues();
+		// values.put(MediaStore.Images.Media.TITLE, filename);
+		// tempFile = getContentResolver().insert(
+		// MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 		try {
-			//get
-			Uri uri = Uri.fromFile(File.createTempFile("image", ".tmp"));
-			intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-			startActivityForResult(intent, REQUEST_GET_CAMERA_PIC);
+			tempFile = Uri.fromFile(File.createTempFile("image", ".jpg"));
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Failed to create temp file");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, tempFile);
+		startActivityForResult(intent, REQUEST_GET_CAMERA_PIC);
+
 	}
 
 	private void showComments(int itemId) {
@@ -334,10 +349,9 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void showUploadView(String pathToImage) {
-		Intent uploadIntent = new Intent(this,
-				UploadActivity.class);
+		Intent uploadIntent = new Intent(this, UploadActivity.class);
 		uploadIntent.setAction(Intent.ACTION_VIEW);
-		uploadIntent.putExtra(KEY_UPLOAD_IMAGE_URI, pathToImage);
+		uploadIntent.putExtra(KEY_UPLOAD_IMAGE_PATH, pathToImage);
 
 		try {
 			this.startActivity(uploadIntent);
@@ -402,8 +416,10 @@ public class FeedActivity extends ListActivity implements Constant {
 		 */
 	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+
 		switch (requestCode) {
 		case LOGIN_REQUEST:
 			if (resultCode == RESULT_OK) {
@@ -423,39 +439,47 @@ public class FeedActivity extends ListActivity implements Constant {
 
 		case REQUEST_GET_CAMERA_PIC:
 			if (resultCode == RESULT_OK) {
-				Uri recievedUri = intent.getData();
-				if (recievedUri != null) {
-					String realPath = getRealPathFromURI(recievedUri);
-					showUploadView(realPath);
+				//String realPath = getRealPathFromUri(tempFile);
+				String uriString = tempFile.toString();
+				URI uRI = null;
+				try {
+					uRI = new URI(uriString);
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				File f = new File(uRI);
+				String fileString = f.toString();
+				
+				showUploadView(fileString);
 			}
 			break;
-		case CHOOSE_IMAGE_REQUEST:
+		case REQUEST_CHOOSE_IMAGE:
 			if (resultCode == RESULT_OK) {
 				Uri recievedUri = intent.getData();
 				if (recievedUri != null) {
-					String realPath = getRealPathFromURI(recievedUri);
+					String realPath = getRealPathFromUri(recievedUri);
 					showUploadView(realPath);
 				}
 			}
 			break;
 		default:
 			break;
+
 		}
 
 	}
 
 	// Convert the image URI to the direct file system path of the image file
-	private String getRealPathFromURI(Uri contentUri) {
+	private String getRealPathFromUri(Uri contentUri) {
 
-		String[] proj = { MediaStore.Images.Media.DATA };
+		String[] proj = { MediaColumns.DATA };
 		Cursor cursor = managedQuery(contentUri, proj, // Which columns to
 														// return
 				null, // WHERE clause; which rows to return (all rows)
 				null, // WHERE clause selection arguments (none)
 				null); // Order-by clause (ascending by name)
-		int column_index = cursor
-				.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+		int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
 		cursor.moveToFirst();
 
 		return cursor.getString(column_index);

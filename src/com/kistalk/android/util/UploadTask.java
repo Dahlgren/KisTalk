@@ -1,6 +1,6 @@
 package com.kistalk.android.util;
 
-import com.kistalk.android.base.KT_UploadCommentMessage;
+import com.kistalk.android.base.KT_UploadMessage;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -30,7 +30,8 @@ import android.util.Log;
  * */
 
 /* The parameters are of the type ContentValues and the result is of type String */
-public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, String> implements Constant {
+public class UploadTask extends AsyncTask<KT_UploadMessage, Void, String>
+		implements Constant {
 
 	private Context context;
 	private ProgressDialog progDialog;
@@ -41,7 +42,7 @@ public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, 
 	 * 
 	 * @param context
 	 */
-	public UploadCommentTask(Context context) {
+	public UploadTask(Context context) {
 		super();
 		this.context = context;
 		this.progDialog = new ProgressDialog(context);
@@ -60,6 +61,7 @@ public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, 
 						.setCancelable(false)
 						.setPositiveButton("Yes",
 								new DialogInterface.OnClickListener() {
+									@Override
 									public void onClick(DialogInterface dialog,
 											int id) {
 										cancel(true); // Kill the running thread
@@ -67,6 +69,7 @@ public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, 
 								})
 						.setNegativeButton("No",
 								new DialogInterface.OnClickListener() {
+									@Override
 									public void onClick(DialogInterface dialog,
 											int id) {
 										dialog.cancel();
@@ -80,15 +83,18 @@ public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, 
 	}
 
 	@Override
-	protected String doInBackground(KT_UploadCommentMessage... messages) {
+	protected String doInBackground(KT_UploadMessage... messages) {
 		KT_TransferManager transferManager = new KT_TransferManager();
 		int count = messages.length;
 		int index = 0;
-		
-		/* If not canceled or not gone through all items - do work */
+
+		/* If not cancelled or not gone through all items - do work */
 		while (!isCancelled() && index < count) {
 			Log.i(LOG_TAG, "Uploading message");
-			transferManager.uploadComment(messages[index]);
+			if (messages[index].getMessageTag() == UPLOAD_PHOTO_MESSAGE_TAG)
+				transferManager.uploadPhotoMessage(messages[index]);
+			else if (messages[index].getMessageTag() == UPLOAD_COMMENT_MESSAGE_TAG)
+				transferManager.uploadComment(messages[index]);
 			index++;
 		}
 		return "Upload complete!";
@@ -96,11 +102,12 @@ public class UploadCommentTask extends AsyncTask<KT_UploadCommentMessage, Void, 
 
 	@Override
 	protected void onPostExecute(String result) {
-		progDialog.dismiss(); //Removes the progress dialog
-		
+		progDialog.dismiss(); // Removes the progress dialog
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(result).setCancelable(true)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}

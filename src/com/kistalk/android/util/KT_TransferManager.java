@@ -14,7 +14,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.apache.http.HttpConnection;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -27,8 +26,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
 import com.kistalk.android.activity.FeedActivity;
-import com.kistalk.android.base.KT_UploadCommentMessage;
-import com.kistalk.android.base.KT_UploadPhotoMessage;
+import com.kistalk.android.base.KT_UploadMessage;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -140,7 +138,7 @@ public class KT_TransferManager implements Constant {
 	 * 
 	 * @param message
 	 */
-	public void uploadMessage(KT_UploadPhotoMessage message) {
+	public void uploadPhotoMessage(KT_UploadMessage message) {
 
 		/* Error check */
 		if (message == null) {
@@ -253,7 +251,7 @@ public class KT_TransferManager implements Constant {
 		return res.getEntity().getContent();
 	}
 
-	public void uploadComment(KT_UploadCommentMessage message) {
+	public void uploadComment(KT_UploadMessage message) {
 		/* Error check */
 		if (message == null) {
 			Log.e(LOG_TAG, "Bad comment message");
