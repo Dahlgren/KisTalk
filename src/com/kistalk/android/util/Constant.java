@@ -42,6 +42,8 @@ public interface Constant {
 	public static final String KEY_URI = "KEY_URI";
 	public static final String KEY_BITMAP = "KEY_BITMAP";
 	public static final String KEY_RESOURCE = "KEY_RESOURCE";
+	public static final String KEY_URL = "KEY_URL";
+	public static final String KEY_IMAGE_CACHE_HASHMAP = "KEY_IMAGE_CACHE_HASHMAP";
 
 	// public static final String KEY_DB_ADAPTER = "KEY_DB_ADAPTER";
 

@@ -1,5 +1,7 @@
 package com.kistalk.android.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,8 +38,6 @@ import android.util.Log;
 
 public class KT_TransferManager implements Constant {
 
-	final private int DOWNLOAD_IMAGE_QUALITY = 95;
-
 	private DefaultHttpClient client;
 	private URL urlObject; // Creates a URL instance
 
@@ -51,10 +51,17 @@ public class KT_TransferManager implements Constant {
 		}
 	}
 
-	public Uri downloadImage(String fileUrl) {
+	/**
+	 * 
+	 * @param imageUrl
+	 *            url for image
+	 * 
+	 * @return path to image
+	 */
+	public String downloadImage(String imageUrl) {
 
 		String delimiter = "://";
-		String[] splittedString = fileUrl.split(delimiter);
+		String[] splittedString = imageUrl.split(delimiter);
 		String scheme = splittedString[0];
 		String hostAndPath = splittedString[1];
 
@@ -83,32 +90,46 @@ public class KT_TransferManager implements Constant {
 			int responseCode = httpConnection.getResponseCode();
 
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				InputStream inStream = httpConnection.getInputStream();
-				Bitmap image = BitmapFactory.decodeStream(inStream);
+				String type = httpConnection.getContentType();
+				if (!(type.equals("image/jpeg") || type.equals("image/png") || type
+						.equals("image/gif")))
+					return null;
+
+				BufferedInputStream buffInStream = new BufferedInputStream(
+						httpConnection.getInputStream());
+
+				byte[] imageData = new byte[httpConnection.getContentLength()];
+
+				int filesize = httpConnection.getContentLength();
+				int bytesRead = 0;
+				int offset = 0;
+				while (bytesRead != -1 && offset < filesize) {
+					bytesRead = buffInStream.read(imageData, offset, filesize
+							- offset);
+					offset += bytesRead;
+				}
 
 				File pathToImage = File.createTempFile("image", ".jpg",
 						FeedActivity.cacheDir);
 
-				FileOutputStream fos = new FileOutputStream(pathToImage);
+				BufferedOutputStream buffOutStream = new BufferedOutputStream(
+						new FileOutputStream(pathToImage));
 
-				if (!image.compress(Bitmap.CompressFormat.JPEG,
-						DOWNLOAD_IMAGE_QUALITY, fos))
-					Log.e(LOG_TAG, KT_TransferManager.class
-							+ ": Error when compressing file");
+				buffOutStream.write(imageData);
 
 				Log.i(LOG_TAG, KT_TransferManager.class
 						+ ": Downloaded image to: " + pathToImage);
 
 				/* Clean up */
-				inStream.close();
-				fos.close();
+				buffInStream.close();
+				buffOutStream.close();
 				httpConnection.disconnect();
 
-				return Uri.fromFile(pathToImage);
+				return pathToImage.toString();
 			} else
 				Log.w(LOG_TAG, "Connection couldn't be established for " + url);
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "ERROR when downloading " + url, e);
+			Log.e(LOG_TAG, "ERROR when downloading/reading/writing " + url, e);
 		}
 
 		return null;

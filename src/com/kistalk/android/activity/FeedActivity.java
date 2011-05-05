@@ -3,25 +3,15 @@ package com.kistalk.android.activity;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.xmlpull.v1.XmlPullParserException;
-
-import com.kistalk.android.R;
-import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
-import com.kistalk.android.base.FeedItem;
-import com.kistalk.android.util.DBLoader;
-import com.kistalk.android.util.ImageLoader;
-import com.kistalk.android.util.KT_TransferManager;
-import com.kistalk.android.util.KT_XMLParser;
-import com.kistalk.android.util.Constant;
-import com.kistalk.android.util.DbAdapter;
 
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
@@ -36,27 +26,34 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.kistalk.android.R;
+import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
+import com.kistalk.android.base.FeedItem;
+import com.kistalk.android.image_management.ImageController;
+import com.kistalk.android.util.Constant;
+import com.kistalk.android.util.DbAdapter;
+import com.kistalk.android.util.KT_TransferManager;
+import com.kistalk.android.util.KT_XMLParser;
+
 public class FeedActivity extends ListActivity implements Constant {
-	
-	private DBLoader dbLoader;
 
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
-
 
 	private static String username;
 	private static String token;
 
 	// private instances of classes
 	public static DbAdapter dbAdapter;
+	public static ImageController imageController = new ImageController();
 
 	private SharedPreferences sp;
-	private Editor spEditor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		initializeVariables();
 		startUpCheck();
 
@@ -65,14 +62,18 @@ public class FeedActivity extends ListActivity implements Constant {
 		setFocusListeners();
 		setOnClickListeners();
 
-		dbAdapter = new DbAdapter(this);
 		dbAdapter.open();
+		restoreImageCache(savedInstanceState);
 
-		sp = getSharedPreferences("KisTalk", MODE_PRIVATE);
-		// spEditor = sp.edit();
+		sp = getPreferences(MODE_PRIVATE);
+		
 		username = sp.getString(ARG_USERNAME, null);
 		token = sp.getString(ARG_TOKEN, null);
 
+		validateCredentials();
+	}
+
+	private void validateCredentials() {
 		if (token == null || username == null)
 			startLoginActivityForResult();
 		else {
@@ -84,8 +85,17 @@ public class FeedActivity extends ListActivity implements Constant {
 				refreshPosts();
 			}
 		}
+		
+	}
 
-		dbLoader = new DBLoader(this); //Starts a new thread executor
+	private void restoreImageCache(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			HashMap<String, String> imageCacheHashMap = (HashMap<String, String>) savedInstanceState
+					.getSerializable(KEY_IMAGE_CACHE_HASHMAP);
+			if (imageCacheHashMap != null)
+				imageController.setCacheHashMap(imageCacheHashMap);
+		}
+
 	}
 
 	@Override
@@ -112,7 +122,6 @@ public class FeedActivity extends ListActivity implements Constant {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		ImageLoader.clearCache();
 		dbAdapter.close();
 	}
 
@@ -141,8 +150,14 @@ public class FeedActivity extends ListActivity implements Constant {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
+		outState.putSerializable("ImageCache",
+				imageController.getCacheHashMap());
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle state) {
 		// TODO Auto-generated method stub
-		super.onSaveInstanceState(outState);
+		super.onRestoreInstanceState(state);
 	}
 
 	private void setFocusListeners() {
@@ -200,6 +215,8 @@ public class FeedActivity extends ListActivity implements Constant {
 	private void initializeVariables() {
 		cacheDir = getCacheDir();
 		filesDir = getFilesDir();
+		dbAdapter = new DbAdapter(this);
+		imageController = new ImageController();
 	}
 
 	/*
@@ -318,12 +335,11 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void refreshPosts() {
-		
-//		dbLoader.start(dbAdapter);
-		
+
+		// dbLoader.start(dbAdapter);
+
 		try {
-			LinkedList<FeedItem> feedItems = KT_XMLParser
-					.fetchAndParse();
+			LinkedList<FeedItem> feedItems = KT_XMLParser.fetchAndParse();
 			if (feedItems == null) {
 				Log.e(LOG_TAG, "Problem when downloading XML file");
 			}
@@ -341,52 +357,37 @@ public class FeedActivity extends ListActivity implements Constant {
 		} catch (URISyntaxException e) {
 			Log.e(LOG_TAG, "" + e, e);
 		}
-		
+
 		populateList();
-		
-		
-//		DBLoader.start(this, this.dbAdapter);
-/*
-		dbSerialExecutor = new DBSerialExecutor(this);
-		Thread dbThread = new Thread(new DBThread(dbAdapter, dbSerialExecutor));
-		dbSerialExecutor.addTask(dbThread);
-		dbSerialExecutor.start();
-*/
-/*		
-		new AsyncTask<Void, Void, Void>() {
-			@Override
-			protected Void doInBackground(Void... params) {
-				try {
-					LinkedList<FeedItem> feedItems = KT_XMLParser
-							.fetchAndParse();
-					if (feedItems == null) {
-						Log.e(LOG_TAG, "Problem when downloading XML file");
-						return null;
-					}
 
-					dbAdapter.deleteAll();
-
-					for (FeedItem feedItem : feedItems) {
-						dbAdapter.insertPost(feedItem.post);
-						dbAdapter.insertComments(feedItem.comments);
-					}
-				} catch (XmlPullParserException e) {
-					Log.e(LOG_TAG, "" + e, e);
-				} catch (IOException e) {
-					Log.e(LOG_TAG, "" + e, e);
-				} catch (URISyntaxException e) {
-					Log.e(LOG_TAG, "" + e, e);
-				}
-
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void result) {
-				populateList();
-			}
-		}.execute((Void[]) null);
-*/
+		// DBLoader.start(this, this.dbAdapter);
+		/*
+		 * dbSerialExecutor = new DBSerialExecutor(this); Thread dbThread = new
+		 * Thread(new DBThread(dbAdapter, dbSerialExecutor));
+		 * dbSerialExecutor.addTask(dbThread); dbSerialExecutor.start();
+		 */
+		/*
+		 * new AsyncTask<Void, Void, Void>() {
+		 * 
+		 * @Override protected Void doInBackground(Void... params) { try {
+		 * LinkedList<FeedItem> feedItems = KT_XMLParser .fetchAndParse(); if
+		 * (feedItems == null) { Log.e(LOG_TAG,
+		 * "Problem when downloading XML file"); return null; }
+		 * 
+		 * dbAdapter.deleteAll();
+		 * 
+		 * for (FeedItem feedItem : feedItems) {
+		 * dbAdapter.insertPost(feedItem.post);
+		 * dbAdapter.insertComments(feedItem.comments); } } catch
+		 * (XmlPullParserException e) { Log.e(LOG_TAG, "" + e, e); } catch
+		 * (IOException e) { Log.e(LOG_TAG, "" + e, e); } catch
+		 * (URISyntaxException e) { Log.e(LOG_TAG, "" + e, e); }
+		 * 
+		 * return null; }
+		 * 
+		 * @Override protected void onPostExecute(Void result) { populateList();
+		 * } }.execute((Void[]) null);
+		 */
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -397,11 +398,12 @@ public class FeedActivity extends ListActivity implements Constant {
 				username = intent.getStringExtra(ARG_USERNAME);
 				token = intent.getStringExtra(ARG_TOKEN);
 
-				Editor spEditor = sp.edit();
-				spEditor.putString(ARG_USERNAME, username);
-				spEditor.putString(ARG_TOKEN, token);
-				spEditor.commit();
-				ImageLoader.clearCache();
+				sp.edit().putString(ARG_USERNAME, username)
+						.putString(ARG_TOKEN, token).commit();
+
+				imageController.clearCache();
+				refreshPosts();
+				
 			} else {
 				finish();
 			}
