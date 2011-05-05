@@ -2,15 +2,14 @@ package com.kistalk.android.activity;
 
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
-import com.kistalk.android.base.KT_UploadCommentMessage;
+import com.kistalk.android.base.KT_UploadMessage;
 import com.kistalk.android.util.Constant;
 import com.kistalk.android.util.ImageLoader;
-import com.kistalk.android.util.UploadCommentTask;
+import com.kistalk.android.util.UploadTask;
 
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -123,11 +122,9 @@ public class ThreadActivity extends ListActivity implements Constant {
 
 					@Override
 					public void onClick(View v) {
-						KT_UploadCommentMessage message = new KT_UploadCommentMessage(
-								itemId,
-								((EditText) findViewById(R.id.inputbox))
-										.getText().toString());
-						new UploadCommentTask(ThreadActivity.this)
+						KT_UploadMessage message = new KT_UploadMessage(null, ((EditText) findViewById(R.id.inputbox))
+										.getText().toString(), itemId, UPLOAD_COMMENT_MESSAGE_TAG);
+						new UploadTask(ThreadActivity.this)
 								.execute(message);
 
 					}

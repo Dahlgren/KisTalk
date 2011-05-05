@@ -66,5 +66,8 @@ public interface Constant {
 	
 	public static final String ARG_COMMENT_ITEMID = "image_id";
 	public static final String ARG_COMMENT_CONTENT = "content";
-
+	
+	// Message constants
+	public static final short UPLOAD_PHOTO_MESSAGE_TAG = 0;
+	public static final short UPLOAD_COMMENT_MESSAGE_TAG = 1;
 }

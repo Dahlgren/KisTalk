@@ -1,9 +1,9 @@
 package com.kistalk.android.activity;
 
 import com.kistalk.android.R;
-import com.kistalk.android.base.KT_UploadPhotoMessage;
+import com.kistalk.android.base.KT_UploadMessage;
 import com.kistalk.android.util.Constant;
-import com.kistalk.android.util.UploadPhotoTask;
+import com.kistalk.android.util.UploadTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,10 +45,10 @@ public class UploadActivity extends Activity implements Constant {
 			@Override
 			public void onClick(View v) {
 				if (v.getId() == R.id.send_button) {
-					KT_UploadPhotoMessage message = new KT_UploadPhotoMessage(
+					KT_UploadMessage message = new KT_UploadMessage(
 							path, ((EditText) findViewById(R.id.inputbox))
-									.getText().toString());
-					new UploadPhotoTask(UploadActivity.this).execute(message);
+									.getText().toString(), -1, UPLOAD_PHOTO_MESSAGE_TAG);
+					new UploadTask(UploadActivity.this).execute(message);
 				} else if (v.getId() == R.id.upload_image) {
 					showDialog(DIALOG_CHOOSE_OPTION_ID);
 				}
