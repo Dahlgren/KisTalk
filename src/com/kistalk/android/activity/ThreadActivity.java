@@ -3,9 +3,10 @@ package com.kistalk.android.activity;
 import com.kistalk.android.R;
 import com.kistalk.android.activity.kt_extensions.KT_SimpleCursorAdapter;
 import com.kistalk.android.base.KT_UploadMessage;
+import com.kistalk.android.image_management.ImageController;
 import com.kistalk.android.util.Constant;
-import com.kistalk.android.util.ImageLoader;
 import com.kistalk.android.util.UploadTask;
+
 
 import android.app.ListActivity;
 import android.database.Cursor;
@@ -19,12 +20,14 @@ import android.widget.TextView;
 public class ThreadActivity extends ListActivity implements Constant {
 
 	private int itemId;
+	private ImageController imageController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		itemId = getIntent().getIntExtra(KEY_ITEM_ID, 0);
 		setContentView(R.layout.thread_view_layout);
+		imageController = FeedActivity.imageController;
 		addImageAsHeader();
 	}
 
@@ -64,7 +67,7 @@ public class ThreadActivity extends ListActivity implements Constant {
 		super.onDestroy();
 	}
 
-	private synchronized void addImageAsHeader() {
+	private void addImageAsHeader() {
 		// instantiate thread feed item layout
 		View imageItem = getLayoutInflater().inflate(
 				R.layout.thread_feed_item_layout, null);
@@ -82,9 +85,9 @@ public class ThreadActivity extends ListActivity implements Constant {
 		String date = cur.getString(cur.getColumnIndex(KEY_ITEM_DATE));
 
 		// Set views
-		ImageLoader.start(imageUrl,
+		imageController.start(imageUrl,
 				(ImageView) imageItem.findViewById(R.id.image));
-		ImageLoader.start(avatarUrl,
+		imageController.start(avatarUrl,
 				(ImageView) imageItem.findViewById(R.id.avatar));
 		((TextView) imageItem.findViewById(R.id.user_name)).setText(userName);
 		((TextView) imageItem.findViewById(R.id.description))

@@ -15,8 +15,6 @@ import android.util.Log;
 public class DbAdapter implements Constant {
 
 	public static final String KEY_ROWID = "_id";
-	// Other keys are in AndXMLParser.java
-
 	private static final String DB_NAME = "kistalk_db";
 	private static final String DB_TABLE_POSTS = "posts";
 	private static final String DB_TABLE_COMMENTS = "comments";
@@ -47,7 +45,6 @@ public class DbAdapter implements Constant {
 	private Context mCtx;
 
 	private Semaphore semMDB = new Semaphore(1);
-	private Semaphore semMDBHelper = new Semaphore(1);
 	
 	/*
 	 * Private static class DatabaseHelper which manages creation and upgrading

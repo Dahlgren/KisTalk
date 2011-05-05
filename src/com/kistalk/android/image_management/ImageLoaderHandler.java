@@ -1,6 +1,9 @@
-package com.kistalk.android.util;
+package com.kistalk.android.image_management;
 
 import java.util.LinkedList;
+
+import com.kistalk.android.activity.FeedActivity;
+import com.kistalk.android.util.Constant;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,16 +16,24 @@ import android.widget.ImageView;
 public class ImageLoaderHandler extends Handler implements Constant {
 
 	private LinkedList<ImageView> imageViews;
+	private ImageController imageController;
+	private String imageUrl;
 
-	public ImageLoaderHandler(ImageView imageView) {
+	public ImageLoaderHandler(ImageView imageView,
+			ImageController imageController, String imageUrl) {
 		imageViews = new LinkedList<ImageView>();
 		imageViews.add(imageView);
+		this.imageController = imageController;
+		this.imageUrl = imageUrl;
+
 	}
 
 	@Override
 	public void handleMessage(Message msg) {
+		imageController.removeHandler(imageUrl);
+
 		Bundle data = msg.getData();
-		
+
 		if (data.containsKey(KEY_BITMAP)) {
 			Bitmap bitmap = msg.getData().getParcelable(KEY_BITMAP);
 			for (ImageView imageView : imageViews)
@@ -35,9 +46,9 @@ public class ImageLoaderHandler extends Handler implements Constant {
 			int resource = msg.getData().getInt(KEY_RESOURCE);
 			for (ImageView imageView : imageViews)
 				imageView.setImageResource(resource);
-		}
-		else
-			Log.e(LOG_TAG, ImageLoaderHandler.class.toString() + ": bad message");
+		} else
+			Log.e(LOG_TAG, ImageLoaderHandler.class.toString()
+					+ ": bad message");
 	}
 
 	public void addViews(ImageView imageView) {

@@ -6,9 +6,6 @@
         <FrameLayout android:layout_width="wrap_content" android:id="@+id/upload_button" android:foreground="@drawable/ic_menu_camera" android:layout_height="fill_parent" android:foregroundGravity="center" android:focusableInTouchMode="true">
             <ImageView android:layout_height="wrap_content" android:visibility="invisible" android:src="@drawable/menuitem_background_focus" android:id="@+id/upload_focus_bg" android:layout_width="wrap_content"></ImageView>
         </FrameLayout>
-        <FrameLayout android:layout_width="wrap_content" android:id="@+id/choose_button" android:foreground="@drawable/ic_menu_upload" android:focusable="true" android:layout_height="fill_parent" android:foregroundGravity="center">
-            <ImageView android:layout_height="wrap_content" android:visibility="invisible" android:src="@drawable/menuitem_background_focus" android:id="@+id/choose_focus_bg" android:layout_width="wrap_content"></ImageView>
-        </FrameLayout>
         <FrameLayout android:layout_width="wrap_content" android:id="@+id/refresh_button" android:foreground="@drawable/ic_menu_refresh" android:focusable="true" android:layout_height="fill_parent" android:foregroundGravity="center">
             <ImageView android:layout_height="wrap_content" android:visibility="invisible" android:src="@drawable/menuitem_background_focus" android:id="@+id/refresh_focus_bg" android:layout_width="wrap_content"></ImageView>
         </FrameLayout>

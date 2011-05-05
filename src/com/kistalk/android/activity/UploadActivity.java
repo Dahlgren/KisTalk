@@ -25,10 +25,6 @@ import android.widget.ImageView;
 
 public class UploadActivity extends Activity implements Constant {
 
-	private static final int DIALOG_CHOOSE_OPTION_ID = 0;
-	private final CharSequence[] OPTIONS = {
-			"Select a new picture from storage", "Take a new picture" };
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
