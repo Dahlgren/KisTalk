@@ -7,7 +7,7 @@ public interface Constant {
 	 * Intent constants
 	 */
 	public static final int CHOOSE_IMAGE_REQUEST = 1337;
-	public static final int GET_CAMERA_PIC_REQUEST = 1338;	
+	public static final int REQUEST_GET_CAMERA_PIC = 1338;	
 	public static final int LOGIN_REQUEST = 1339;
 	public static final int REQUEST_QR_READER = 1340;
 

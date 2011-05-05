@@ -14,8 +14,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +42,7 @@ public class FeedActivity extends ListActivity implements Constant {
 	// public directories for cache and files
 	public static File cacheDir;
 	public static File filesDir;
+	public static File publicFilesDir;
 
 	private static String username;
 	private static String token;
@@ -66,7 +69,7 @@ public class FeedActivity extends ListActivity implements Constant {
 		restoreImageCache(savedInstanceState);
 
 		sp = getPreferences(MODE_PRIVATE);
-		
+
 		username = sp.getString(ARG_USERNAME, null);
 		token = sp.getString(ARG_TOKEN, null);
 
@@ -85,7 +88,7 @@ public class FeedActivity extends ListActivity implements Constant {
 				refreshPosts();
 			}
 		}
-		
+
 	}
 
 	private void restoreImageCache(Bundle savedInstanceState) {
@@ -305,7 +308,16 @@ public class FeedActivity extends ListActivity implements Constant {
 
 	private void takePhotoAction() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		startActivityForResult(intent, GET_CAMERA_PIC_REQUEST);
+		try {
+			//get
+			Uri uri = Uri.fromFile(File.createTempFile("image", ".tmp"));
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+			startActivityForResult(intent, REQUEST_GET_CAMERA_PIC);
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "Failed to create temp file");
+			e.printStackTrace();
+		}
+		
 	}
 
 	private void showComments(int itemId) {
@@ -322,13 +334,13 @@ public class FeedActivity extends ListActivity implements Constant {
 	}
 
 	private void showUploadView(String pathToImage) {
-		Intent uploadIntent = new Intent(FeedActivity.this,
+		Intent uploadIntent = new Intent(this,
 				UploadActivity.class);
 		uploadIntent.setAction(Intent.ACTION_VIEW);
 		uploadIntent.putExtra(KEY_UPLOAD_IMAGE_URI, pathToImage);
 
 		try {
-			FeedActivity.this.startActivity(uploadIntent);
+			this.startActivity(uploadIntent);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.toString());
 		}
@@ -403,13 +415,21 @@ public class FeedActivity extends ListActivity implements Constant {
 
 				imageController.clearCache();
 				refreshPosts();
-				
+
 			} else {
 				finish();
 			}
 			break;
 
-		case GET_CAMERA_PIC_REQUEST:
+		case REQUEST_GET_CAMERA_PIC:
+			if (resultCode == RESULT_OK) {
+				Uri recievedUri = intent.getData();
+				if (recievedUri != null) {
+					String realPath = getRealPathFromURI(recievedUri);
+					showUploadView(realPath);
+				}
+			}
+			break;
 		case CHOOSE_IMAGE_REQUEST:
 			if (resultCode == RESULT_OK) {
 				Uri recievedUri = intent.getData();

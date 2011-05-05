@@ -95,7 +95,7 @@ public class UploadActivity extends Activity implements Constant {
 
 	private void takePhotoAction() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		startActivityForResult(intent, GET_CAMERA_PIC_REQUEST);
+		startActivityForResult(intent, REQUEST_GET_CAMERA_PIC);
 	}
 
 	
@@ -108,7 +108,7 @@ public class UploadActivity extends Activity implements Constant {
 			if (recievedUri != null) {
 
 				String realPath = getRealPathFromURI(recievedUri);
-				if (requestCode == GET_CAMERA_PIC_REQUEST) {
+				if (requestCode == REQUEST_GET_CAMERA_PIC) {
 					((ImageView) findViewById(R.id.upload_image)).setImageBitmap(BitmapFactory.decodeFile(realPath));
 				}
 				if (requestCode == CHOOSE_IMAGE_REQUEST) {
