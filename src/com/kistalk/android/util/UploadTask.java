@@ -61,6 +61,7 @@ public class UploadTask extends AsyncTask<KT_UploadMessage, Void, String>
 						.setCancelable(false)
 						.setPositiveButton("Yes",
 								new DialogInterface.OnClickListener() {
+									@Override
 									public void onClick(DialogInterface dialog,
 											int id) {
 										cancel(true); // Kill the running thread
@@ -68,6 +69,7 @@ public class UploadTask extends AsyncTask<KT_UploadMessage, Void, String>
 								})
 						.setNegativeButton("No",
 								new DialogInterface.OnClickListener() {
+									@Override
 									public void onClick(DialogInterface dialog,
 											int id) {
 										dialog.cancel();
@@ -105,6 +107,7 @@ public class UploadTask extends AsyncTask<KT_UploadMessage, Void, String>
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(result).setCancelable(true)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}

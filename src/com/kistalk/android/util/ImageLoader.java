@@ -123,6 +123,7 @@ public class ImageLoader implements Runnable, Constant {
 	 * and if it's a miss, then the worker thread will download the image from
 	 * the Web.
 	 */
+	@Override
 	public void run() {
 		Bundle bundle = new Bundle();
 		if (!imageCache.contains(imageUrl)) {

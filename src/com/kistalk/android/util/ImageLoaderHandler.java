@@ -19,6 +19,7 @@ public class ImageLoaderHandler extends Handler implements Constant {
 		imageViews.add(imageView);
 	}
 
+	@Override
 	public void handleMessage(Message msg) {
 		Bundle data = msg.getData();
 		
